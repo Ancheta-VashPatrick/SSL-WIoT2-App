@@ -32,7 +32,7 @@ export default function TabLayout() {
         options={{
           title: "Dashboard",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="dashboard" color={color} />
+            <IconSymbol size={28} name="gauge" color={color} />
           ),
         }}
       />
@@ -42,7 +42,7 @@ export default function TabLayout() {
           options={{
             title: "Collect",
             tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="bluetooth" color={color} />
+              <IconSymbol size={28} name="tray.and.arrow.down.fill" color={color} />
             ),
           }}
         />
@@ -59,7 +59,7 @@ export default function TabLayout() {
         options={{
           title: "Options",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="list" color={color} />
+            <IconSymbol size={28} name="wrench.fill" color={color} />
           ),
         }}
       />
