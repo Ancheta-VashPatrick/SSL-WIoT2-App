@@ -8,7 +8,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
-import useBLE from "@/app/useBLE";
+import useBLE from "@/hooks/useBLE";
 
 export default function CollectScreen() {
   const {
@@ -44,8 +44,8 @@ export default function CollectScreen() {
     <ThemedView style={{ flexDirection: "row" }}>
       <ThemedView style={{ width: 200, backgroundColor: "lightyellow" }}>
         <ThemedText style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}>
-          {JSON.stringify(item.timestamp)}
-          {/* item ? {item.timestamp.getFullYear()}-{item.timestamp.getMonth()}-{item.timestamp.getDate()} {item.timestamp.getHours()}:{item.timestamp.getMinutes()} : "" */}
+          {/* {JSON.stringify(item.date)} */}
+          {item ? `${item.date.getFullYear()}-${item.date.getMonth()}-${item.date.getDate()} ${item.date.getHours()}:${item.date.getMinutes()}` : ""}
         </ThemedText>
       </ThemedView>
       <ThemedView style={{ width: 100, backgroundColor: "lightpink" }}>
@@ -92,7 +92,9 @@ export default function CollectScreen() {
                 scrollEnabled={false}
               />
             </ThemedView>
-            {`\n${JSON.stringify(tempVals)}`}
+            <ThemedText>
+            {/* {`\n${tempVals[0].date}`} */}
+            </ThemedText>
           </>
         ) : (
           <ThemedText>

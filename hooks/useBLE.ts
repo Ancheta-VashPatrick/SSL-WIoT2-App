@@ -11,6 +11,8 @@ import {
   Characteristic,
   Device,
 } from "react-native-ble-plx";
+import { GraphPoint } from "react-native-graph";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
@@ -23,7 +25,7 @@ function useBLE() {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [color, setColor] = useState("white");
-  const [tempVals, setTempVals] = useState<Object[]>([]);
+  const [tempVals, setTempVals] = useState<GraphPoint[]>([]);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -202,12 +204,12 @@ function useBLE() {
         return;
       }
 
-      // const readVal = base64.decode(characteristic.value);
+      const readVal = base64.decode(characteristic.value);
       const TZ_OFFSET = 8;
-      const readVal =
-        "2024112311440001.69,11450020.10,11460100.09,11472000.60|11463000.07,11470000.00,";
+      // const readVal =
+      //   "2024112311440001.69,11450020.10,11460100.09,11472000.60|11463000.07,11470000.00,";
 
-      let tempValsBuffer = [];
+      let tempValsBuffer = new Array;
 
       let start = 8;
       let end = 19;
@@ -224,17 +226,23 @@ function useBLE() {
         }
 
         tempValsBuffer.push({
-          timestamp: new Date(
+          date: new Date(
             currDate.getTime() +
               parseInt(readVal.substring(start, start + 2)) * 3600000 +
               parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
               TZ_OFFSET * 3600000
-          ).toJSON(),
+          ),
           value: parseFloat(readVal.substring(start + 4, end)),
         });
         console.log(tempValsBuffer);
         start += 12;
         end += 12;
+      }
+
+      try {
+        await AsyncStorage.setItem('temp-vals', JSON.stringify(tempValsBuffer));
+      } catch (e) {
+        // saving error
       }
 
       setTempVals(tempValsBuffer);
