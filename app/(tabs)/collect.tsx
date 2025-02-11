@@ -6,9 +6,11 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
 import useBLE from "@/hooks/useBLE";
+
+import Aes from 'react-native-aes-crypto'
 
 export default function CollectScreen() {
   const {
@@ -39,6 +41,56 @@ export default function CollectScreen() {
     scanForDevices();
     setIsModalVisible(true);
   };
+
+  const [decryptedText, setDecryptedText] = useState("second");
+
+  useEffect(() => {
+    const decryptData = async () => {
+      // const val = await Aes.decrypt("9ETXXL2ldN7YrJuUUgSIKg==", "5169702A48227366786F232B655A7337", "F%&bH[g9u26'CxE1", 'aes-128-cbc');
+      const val = await Aes.decrypt("9ETXXL2ldN7YrJuUUgSIKtB6wSjqrmFb8aIp6vkvI1s=", "5169702A48227366786F232B655A7337", "46252662485B67397532362743784531", 'aes-128-cbc');
+      setDecryptedText(val);
+
+    //   const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length, 'sha256')
+
+    //   const encryptData = (text, key, iv) => {
+    //       return Aes.encrypt(text, key, iv, 'aes-128-cbc').then(cipher => ({
+    //           cipher,
+    //           iv,
+    //       }))
+    //   }
+
+    //   const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv, 'aes-128-cbc')
+
+    //   try {
+    //           console.log('Key:', "5169702A48227366786F232B655A7337")
+    //           encryptData('getInitialTime00', "5169702A48227366786F232B655A7337", "46252662485B67397532362743784531")
+    //               .then(({ cipher, iv }) => {
+    //                   console.log('Encrypted:', cipher)
+    //                   console.log('IV:', iv)
+
+    //                   decryptData({ cipher, iv }, "5169702A48227366786F232B655A7337")
+    //                       .then(text => {
+    //                           console.log('Decrypted:', text)
+    //                       })
+    //                       .catch(error => {
+    //                           console.log(error)
+    //                       })
+
+    //                   Aes.hmac256(cipher, "5169702A48227366786F232B655A7337").then(hash => {
+    //                       console.log('HMAC', hash)
+    //                   })
+    //               })
+    //               .catch(error => {
+    //                   console.log(error)
+    //               })
+    //   } catch (e) {
+    //       console.error(e)
+    //   }
+    }
+
+    decryptData().catch(console.error)
+  }, [])
+  
 
   const item = ({ item }) => (
     <ThemedView style={{ flexDirection: "row" }}>
@@ -105,6 +157,14 @@ export default function CollectScreen() {
       <TouchableOpacity onPress={openModal} style={styles.ctaButton}>
         <ThemedText style={styles.ctaButtonText}>Connect</ThemedText>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={openModal} style={styles.ctaButton}>
+        <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
+      </TouchableOpacity>
+
+      <ThemedText>
+        {decryptedText}
+      </ThemedText>
 
       <DeviceModal
         closeModal={hideModal}
