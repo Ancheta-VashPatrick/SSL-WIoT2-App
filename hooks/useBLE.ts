@@ -14,9 +14,17 @@ import {
 import { GraphPoint } from "react-native-graph";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import Aes from "react-native-aes-crypto";
+
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 const LED_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1220";
+const CHARACTERISTIC_UUIDS = [
+  "19b10001-e8f2-537e-4f6c-d104768a1217",
+  "19b10001-e8f2-537e-4f6c-d104768a1218",
+  "19b10001-e8f2-537e-4f6c-d104768a1219",
+  "19b10001-e8f2-537e-4f6c-d104768a1220",
+];
 const TEMP_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1218";
 
 const bleManager = new BleManager();
@@ -26,6 +34,9 @@ function useBLE() {
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [color, setColor] = useState("white");
   const [tempVals, setTempVals] = useState<GraphPoint[]>([]);
+
+  const [portTypes, setPortTypes] = useState(["flow", null, null, null]);
+  const [readVals, setReadVals] = useState<GraphPoint[][]>([[], [], [], []]);
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -116,7 +127,7 @@ function useBLE() {
       bleManager.stopDeviceScan();
 
       // startStreamingData(deviceConnection);
-      startReadingTemp(deviceConnection);
+      startReadingPorts(deviceConnection);
     } catch (e) {
       console.log("FAILED TO CONNECT", e);
     }
@@ -184,19 +195,21 @@ function useBLE() {
     }
   };
 
-  const startReadingTemp = async (device: Device | null) => {
+  const startReadingPorts = async (device: Device | null) => {
     const interval = setInterval(() => {
-      readTemp(device);
+      for (let i = 0; i < CHARACTERISTIC_UUIDS.length; i++) {
+        readPort(device, i);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
   };
 
-  const readTemp = async (device: Device | null) => {
+  const readPort = async (device: Device | null, portNumber: number) => {
     if (device) {
       const characteristic = await device.readCharacteristicForService(
         DATA_SERVICE_UUID,
-        TEMP_CHARACTERISTIC_UUID
+        CHARACTERISTIC_UUIDS[portNumber]
       );
 
       if (!characteristic?.value) {
@@ -204,49 +217,87 @@ function useBLE() {
         return;
       }
 
-      const readVal = base64.decode(characteristic.value);
-      const TZ_OFFSET = 8;
-      // const readVal =
-      //   "2024112311440001.69,11450020.10,11460100.09,11472000.60|11463000.07,11470000.00,";
-
-      let tempValsBuffer = new Array;
-
-      let start = 8;
-      let end = 19;
-
-      let currDate = new Date(
-        `${readVal.substring(0, 4)}-${readVal.substring(
-          4,
-          6
-        )}-${readVal.substring(6, 8)}`
-      );
-      while (end < readVal.length) {
-        if (readVal.charAt(start - 1) === "|") {
-          currDate = new Date(currDate.getTime() + 86400000);
-        }
-
-        tempValsBuffer.push({
-          date: new Date(
-            currDate.getTime() +
-              parseInt(readVal.substring(start, start + 2)) * 3600000 +
-              parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
-              TZ_OFFSET * 3600000
-          ),
-          value: parseFloat(readVal.substring(start + 4, end)),
-        });
-        console.log(tempValsBuffer);
-        start += 12;
-        end += 12;
-      }
-
+      let rawVal = null;
+      // Decrypt value
       try {
-        await AsyncStorage.setItem('temp-vals', JSON.stringify(tempValsBuffer));
-      } catch (e) {
-        // saving error
+        rawVal = await Aes.decrypt(
+          base64.decode(characteristic.value),
+          "5169702A48227366786F232B655A7337",
+          "46252662485B67397532362743784531",
+          "aes-128-cbc"
+        );
+      } catch (error) {
+        console.log(error);
       }
+      if (rawVal) {
+        const readVal = rawVal.slice(5, -1);
+        // console.log(readVal);
+        let rawPortType = rawVal.slice(0, 4);
+        const portType =
+          rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
+        console.log(portType);
 
-      setTempVals(tempValsBuffer);
-      console.log(readVal);
+        const TZ_OFFSET = 8;
+
+        let readValsBuffer = new Array();
+
+        let start = 8;
+        let end = (portType == "flow") ? 21 : 19;
+
+        let currDate = new Date(
+          `${readVal.substring(0, 4)}-${readVal.substring(
+            4,
+            6
+          )}-${readVal.substring(6, 8)}`
+        );
+        while (end < readVal.length) {
+          if (readVal.charAt(start - 1) === "|") {
+            currDate = new Date(currDate.getTime() + 86400000);
+          }
+
+          readValsBuffer.push({
+            date: new Date(
+              currDate.getTime() +
+                parseInt(readVal.substring(start, start + 2)) * 3600000 +
+                parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
+                TZ_OFFSET * 3600000
+            ),
+            value: parseFloat(
+              readVal.substring(start + (portType == "flow" ? 7 : 4), end)
+            ),
+          });
+          if (portType == "flow") {
+            // console.log(rawVal);
+            // console.log(readValsBuffer);
+            start += 15;
+            end += 15;
+          } else {
+            start += 12;
+            end += 12;
+          }
+        }
+        
+        let oldTypes = portTypes;
+        oldTypes[portNumber] = portType;
+        setPortTypes(oldTypes);
+        let oldVals = readVals;
+        oldVals[portNumber] = readValsBuffer;
+        setReadVals(oldVals);
+        // console.log(rawVal);
+        
+        try {
+          await AsyncStorage.setItem(
+            "port-types",
+            JSON.stringify(portTypes)
+          );
+          await AsyncStorage.setItem(
+            "read-vals",
+            JSON.stringify(readVals)
+          );
+        } catch (e) {
+          // saving error
+        }
+      }
     } else {
       console.log("No Device Connected");
     }
@@ -261,6 +312,8 @@ function useBLE() {
     tempVals,
     requestPermissions,
     toggleLED,
+    portTypes,
+    readVals,
   };
 }
 

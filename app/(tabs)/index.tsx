@@ -48,9 +48,12 @@ export default function DashboardScreen() {
         }
       >
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Welcome!</ThemedText>
+          <ThemedText type="title">Dashboard</ThemedText>
           {/* <HelloWave /> */}
         </ThemedView>
+        <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
+          <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
+        </TouchableOpacity>
         <ThemedView style={styles.stepContainer}>
           <ThemedText type="subtitle">
             Step 1: Try it! {graphLabel.toPrecision(2)}
@@ -68,29 +71,6 @@ export default function DashboardScreen() {
             points={graphPoints}
             // BottomAxisLabel={() => <ThemedText>WAH</ThemedText>}
           />
-          <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
-            <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          <ThemedText>
-            Tap the Explore tab to learn more about what's included in this
-            starter app.
-          </ThemedText>
-        </ThemedView>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-          <ThemedText>
-            When you're ready, run{" "}
-            <ThemedText type="defaultSemiBold">
-              npm run reset-project
-            </ThemedText>{" "}
-            to get a fresh <ThemedText type="defaultSemiBold">app</ThemedText>{" "}
-            directory. This will move the current{" "}
-            <ThemedText type="defaultSemiBold">app</ThemedText> to{" "}
-            <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-          </ThemedText>
         </ThemedView>
       </ParallaxScrollView>
     </GestureHandlerRootView>

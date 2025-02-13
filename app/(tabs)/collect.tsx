@@ -16,7 +16,6 @@ import { useEffect, useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
 import useBLE from "@/hooks/useBLE";
 
-import Aes from "react-native-aes-crypto";
 import useRequests from "@/hooks/useRequests";
 
 export default function CollectScreen() {
@@ -28,7 +27,8 @@ export default function CollectScreen() {
     color,
     tempVals,
     requestPermissions,
-    toggleLED,
+    portTypes,
+    readVals,
   } = useBLE();
 
   const { uploadData } = useRequests();
@@ -51,59 +51,12 @@ export default function CollectScreen() {
     setIsModalVisible(true);
   };
 
-  const [decryptedText, setDecryptedText] = useState("second");
-
-  useEffect(() => {
-    const decryptData = async () => {
-      // const val = await Aes.decrypt("9ETXXL2ldN7YrJuUUgSIKg==", "5169702A48227366786F232B655A7337", "F%&bH[g9u26'CxE1", 'aes-128-cbc');
-      const val = await Aes.decrypt(
-        "9ETXXL2ldN7YrJuUUgSIKtB6wSjqrmFb8aIp6vkvI1s=",
-        "5169702A48227366786F232B655A7337",
-        "46252662485B67397532362743784531",
-        "aes-128-cbc"
-      );
-      setDecryptedText(val);
-
-      //   const generateKey = (password, salt, cost, length) => Aes.pbkdf2(password, salt, cost, length, 'sha256')
-
-      //   const encryptData = (text, key, iv) => {
-      //       return Aes.encrypt(text, key, iv, 'aes-128-cbc').then(cipher => ({
-      //           cipher,
-      //           iv,
-      //       }))
-      //   }
-
-      //   const decryptData = (encryptedData, key) => Aes.decrypt(encryptedData.cipher, key, encryptedData.iv, 'aes-128-cbc')
-
-      //   try {
-      //           console.log('Key:', "5169702A48227366786F232B655A7337")
-      //           encryptData('getInitialTime00', "5169702A48227366786F232B655A7337", "46252662485B67397532362743784531")
-      //               .then(({ cipher, iv }) => {
-      //                   console.log('Encrypted:', cipher)
-      //                   console.log('IV:', iv)
-
-      //                   decryptData({ cipher, iv }, "5169702A48227366786F232B655A7337")
-      //                       .then(text => {
-      //                           console.log('Decrypted:', text)
-      //                       })
-      //                       .catch(error => {
-      //                           console.log(error)
-      //                       })
-
-      //                   Aes.hmac256(cipher, "5169702A48227366786F232B655A7337").then(hash => {
-      //                       console.log('HMAC', hash)
-      //                   })
-      //               })
-      //               .catch(error => {
-      //                   console.log(error)
-      //               })
-      //   } catch (e) {
-      //       console.error(e)
-      //   }
-    };
-
-    decryptData().catch(console.error);
-  }, []);
+  const typeMap: { [key: string]: any } = {
+    flow: "Flow",
+    temp: "Temperature",
+    turb: "Turbidity",
+    ph: "pH",
+  };
 
   const item = ({ item }) => (
     <ThemedView style={{ flexDirection: "row" }}>
@@ -113,7 +66,22 @@ export default function CollectScreen() {
         >
           {/* {JSON.stringify(item.date)} */}
           {item
-            ? `${item.date.getFullYear()}-${item.date.getMonth()}-${item.date.getDate()} ${item.date.getHours()}:${item.date.getMinutes()}`
+            ? `${item.date
+                .getFullYear()
+                .toString()
+                .padStart(4, "0")}-${item.date
+                .getMonth()
+                .toString()
+                .padStart(2, "0")}-${item.date
+                .getDate()
+                .toString()
+                .padStart(2, "0")} ${item.date
+                .getHours()
+                .toString()
+                .padStart(2, "0")}:${item.date
+                .getMinutes()
+                .toString()
+                .padStart(2, "0")}`
             : ""}
         </ThemedText>
       </ThemedView>
@@ -146,15 +114,21 @@ export default function CollectScreen() {
       {connectedDevice ? (
         <>
           <ThemedText style={{ backgroundColor: color }}>Connected</ThemedText>
-          <ThemedView
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <FlatList data={tempVals} renderItem={item} scrollEnabled={false} />
-          </ThemedView>
+          {readVals.map((prop, key) => (
+            <ThemedView
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              key={key}
+            >
+              <ThemedText>
+                {portTypes[key] === null ? "" : typeMap[portTypes[key]]}
+              </ThemedText>
+              <FlatList data={prop} renderItem={item} scrollEnabled={false} />
+            </ThemedView>
+          ))}
           <ThemedText>{/* {`\n${tempVals[0].date}`} */}</ThemedText>
         </>
       ) : (
@@ -168,8 +142,6 @@ export default function CollectScreen() {
       <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
         <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
       </TouchableOpacity>
-
-      <ThemedText>{decryptedText}</ThemedText>
 
       <DeviceModal
         closeModal={hideModal}
