@@ -29,7 +29,7 @@ export default function DashboardScreen() {
   };
 
   const refreshGraph = async function () {
-    console.log("Test");
+    // console.log("Test");
     // console.log(graphPoints);
     try {
       const value = await AsyncStorage.getItem("read-vals");

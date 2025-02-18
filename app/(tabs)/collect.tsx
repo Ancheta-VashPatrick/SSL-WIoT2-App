@@ -31,7 +31,7 @@ export default function CollectScreen() {
     readVals,
   } = useBLE();
 
-  const { uploadData } = useRequests();
+  const { successfulUploads, uploadData } = useRequests();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -152,6 +152,8 @@ export default function CollectScreen() {
         <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
       </TouchableOpacity>
 
+      {/* <ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText> */}
+
       <DeviceModal
         closeModal={hideModal}
         visible={isModalVisible}
@@ -186,5 +188,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
+  },
+  ctaText: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
