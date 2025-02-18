@@ -23,9 +23,9 @@ export default function CollectScreen() {
     allDevices,
     connectedDevice,
     connectToDevice,
+    disconnectDevice,
     scanForPeripherals,
     color,
-    tempVals,
     requestPermissions,
     portTypes,
     readVals,
@@ -113,7 +113,6 @@ export default function CollectScreen() {
 
       {connectedDevice ? (
         <>
-          <ThemedText style={{ backgroundColor: color }}>Connected</ThemedText>
           {readVals.map((prop, key) => (
             <ThemedView
               style={{
@@ -126,7 +125,12 @@ export default function CollectScreen() {
               <ThemedText>
                 {portTypes[key] === null ? "" : typeMap[portTypes[key]]}
               </ThemedText>
-              <FlatList data={prop} renderItem={item} scrollEnabled={false} />
+              <FlatList
+                data={prop}
+                renderItem={item}
+                scrollEnabled={false}
+                extraData={prop}
+              />
             </ThemedView>
           ))}
           <ThemedText>{/* {`\n${tempVals[0].date}`} */}</ThemedText>
@@ -135,8 +139,13 @@ export default function CollectScreen() {
         <ThemedText>Please connect the ESP32-WIOT2</ThemedText>
       )}
 
-      <TouchableOpacity onPress={openModal} style={styles.ctaButton}>
-        <ThemedText style={styles.ctaButtonText}>Connect</ThemedText>
+      <TouchableOpacity
+        onPress={connectedDevice ? disconnectDevice : openModal}
+        style={styles.ctaButton}
+      >
+        <ThemedText style={styles.ctaButtonText}>
+          {connectedDevice ? "Disconnect" : "Connect"}
+        </ThemedText>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>

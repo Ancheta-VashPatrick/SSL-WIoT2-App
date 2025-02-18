@@ -33,10 +33,12 @@ function useBLE() {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [color, setColor] = useState("white");
-  const [tempVals, setTempVals] = useState<GraphPoint[]>([]);
 
   const [portTypes, setPortTypes] = useState(["flow", null, null, null]);
+  const [tempTypes, setTempTypes] = useState<(string | null)[]>(['flow', 'temp', 'turb', 'ph']);
   const [readVals, setReadVals] = useState<GraphPoint[][]>([[], [], [], []]);
+
+  const [clearReadInterval, setClearReadInterval] = useState(() => {return () => {return () => {}}});
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -133,6 +135,14 @@ function useBLE() {
     }
   };
 
+  const disconnectDevice = async () => {
+    // console.log(connectedDevice);
+    clearReadInterval();
+    await connectedDevice?.cancelConnection();
+    setConnectedDevice(null);
+    // console.log(connectedDevice);
+  }
+
   const onDataUpdate = (
     error: BleError | null,
     characteristic: Characteristic | null
@@ -195,14 +205,21 @@ function useBLE() {
     }
   };
 
-  const startReadingPorts = async (device: Device | null) => {
-    const interval = setInterval(() => {
-      for (let i = 0; i < CHARACTERISTIC_UUIDS.length; i++) {
+  const startReadingPorts = (device: Device | null) => {
+    const interval = setInterval(async () => {
+      for (let i = 0; i < 4; i++) {
         readPort(device, i);
+        // console.log(i);
       }
+      setTempTypes(portTypes);
+      setPortTypes(["flow", "flow", "flow", "flow"]);
+      setPortTypes(tempTypes);
+
     }, 1000);
 
-    return () => clearInterval(interval);
+    setClearReadInterval(() => {return () => clearInterval(interval)});
+
+    // return () => clearInterval(interval);
   };
 
   const readPort = async (device: Device | null, portNumber: number) => {
@@ -231,11 +248,11 @@ function useBLE() {
       }
       if (rawVal) {
         const readVal = rawVal.slice(5, -1);
-        // console.log(readVal);
+        console.log(rawVal);
         let rawPortType = rawVal.slice(0, 4);
         const portType =
           rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
-        console.log(portType);
+        // console.log(portType);
 
         const TZ_OFFSET = 8;
 
@@ -305,11 +322,11 @@ function useBLE() {
 
   return {
     connectToDevice,
+    disconnectDevice,
     allDevices,
     scanForPeripherals,
     connectedDevice,
     color,
-    tempVals,
     requestPermissions,
     toggleLED,
     portTypes,

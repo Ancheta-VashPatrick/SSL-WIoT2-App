@@ -10,25 +10,60 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useState } from "react";
 import useBLE from "@/hooks/useBLE";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GraphView } from "@/components/GraphView";
 
 export default function DashboardScreen() {
-  const [graphPoints, setGraphPoints] = useState(generateSinusGraphData(10));
-  const [graphLabel, setGraphLabel] = useState(graphPoints.at(-1).value);
+  const [graphTitles, setGraphTitles] = useState(["", "", "", ""]);
+  const [graphPoints, setGraphPoints] = useState([
+    generateSinusGraphData(10),
+    generateSinusGraphData(20),
+    generateSinusGraphData(30),
+    generateSinusGraphData(40),
+  ]);
+
+  const typeMap: { [key: string]: any } = {
+    flow: "Flow",
+    temp: "Temperature",
+    turb: "Turbidity",
+    ph: "pH",
+  };
 
   const refreshGraph = async function () {
     console.log("Test");
-    console.log(graphPoints);
+    // console.log(graphPoints);
     try {
-      const value = await AsyncStorage.getItem("temp-vals");
+      const value = await AsyncStorage.getItem("read-vals");
       if (value !== null) {
         // console.log(value);
         // console.log(JSON.parse(value));
-        const pvalue: GraphPoint[] = fromList(JSON.parse(value));
+        const pvalue: GraphPoint[][] = (JSON.parse(value)).map((item) => {
+          // console.log(item);
+          if (item.length) {
+            return fromList(item);
+          } 
+          else {
+            return generateSinusGraphData(10);
+          }
+        });
         // const pvalue: GraphPoint[] = new Array(JSON.parse(value));
-        console.log(pvalue);
-        console.log(pvalue.at(-1)?.date);
+        // console.log(pvalue);
+        // console.log(pvalue.at(-1)?.date);
         // value previously stored
         setGraphPoints(pvalue);
+      }
+    } catch (e) {
+      // error reading value
+      console.log(e);
+    }
+    try {
+      const value = await AsyncStorage.getItem("port-types");
+      if (value !== null) {
+        // console.log(value);
+        // console.log(JSON.parse(value));
+        const pvalue: string[] = (JSON.parse(value)).map((item) => (typeMap[item]));
+        // console.log(pvalue);
+        // value previously stored
+        setGraphTitles(pvalue);
       }
     } catch (e) {
       // error reading value
@@ -54,24 +89,9 @@ export default function DashboardScreen() {
         <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
           <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
         </TouchableOpacity>
-        <ThemedView style={styles.stepContainer}>
-          <ThemedText type="subtitle">
-            Step 1: Try it! {graphLabel.toPrecision(2)}
-          </ThemedText>
-          <LineGraph
-            style={styles.graph}
-            animated={true}
-            enablePanGesture={true}
-            enableIndicator={true}
-            onPointSelected={(p) => setGraphLabel(p.value)}
-            onGestureEnd={() => setGraphLabel(graphPoints.at(-1).value)}
-            horizontalPadding={true ? 15 : 0}
-            enableFadeInMask={true}
-            color={"#A1CEDC"}
-            points={graphPoints}
-            // BottomAxisLabel={() => <ThemedText>WAH</ThemedText>}
-          />
-        </ThemedView>
+        {graphTitles.map((prop, key) => (
+          <GraphView key={key} title={prop} graphPoints={graphPoints[key]}></GraphView>
+        ))}
       </ParallaxScrollView>
     </GestureHandlerRootView>
   );
