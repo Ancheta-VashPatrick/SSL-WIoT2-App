@@ -129,7 +129,7 @@ export default function CollectScreen() {
                 data={prop}
                 renderItem={item}
                 scrollEnabled={false}
-                extraData={prop}
+                extraData={portTypes}
               />
             </ThemedView>
           ))}

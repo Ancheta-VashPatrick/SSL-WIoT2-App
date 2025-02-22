@@ -34,8 +34,8 @@ function useBLE() {
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [color, setColor] = useState("white");
 
-  const [portTypes, setPortTypes] = useState(["flow", null, null, null]);
-  const [tempTypes, setTempTypes] = useState<(string | null)[]>(['flow', 'temp', 'turb', 'ph']);
+  const [portTypes, setPortTypes] = useState<(string | null)[]>([null, null, null, null]);
+  const [tempTypes, setTempTypes] = useState<(string | null)[]>([null, null, null, null]);
   const [readVals, setReadVals] = useState<GraphPoint[][]>([[], [], [], []]);
 
   const [clearReadInterval, setClearReadInterval] = useState(() => {return () => {return () => {}}});
@@ -208,14 +208,11 @@ function useBLE() {
   const startReadingPorts = (device: Device | null) => {
     const interval = setInterval(async () => {
       for (let i = 0; i < 4; i++) {
-        readPort(device, i);
+        await readPort(device, i);
         // console.log(i);
       }
       setTempTypes(portTypes);
-      setPortTypes(["flow", "flow", "flow", "flow"]);
-      setPortTypes(tempTypes);
-
-    }, 1000);
+    }, 3000);
 
     setClearReadInterval(() => {return () => clearInterval(interval)});
 
