@@ -5,12 +5,24 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { fromList, generateSinusGraphData } from "../data";
-import { GraphPoint, LineGraph } from "react-native-graph";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useState } from "react";
 import useBLE from "@/hooks/useBLE";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { GraphView } from "@/components/GraphView";
+import { Element } from "@/components/ChartView";
+
+import {
+  Chart,
+  VerticalAxis,
+  HorizontalAxis,
+  Line,
+  Tooltip,
+  Area,
+} from "react-native-responsive-linechart";
+
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { ChartView } from "@/components/ChartView";
 
 export default function DashboardScreen() {
   const [graphTitles, setGraphTitles] = useState(["", "", "", ""]);
@@ -36,12 +48,11 @@ export default function DashboardScreen() {
       if (value !== null) {
         // console.log(value);
         // console.log(JSON.parse(value));
-        const pvalue: GraphPoint[][] = (JSON.parse(value)).map((item) => {
+        const pvalue: Element[][] = JSON.parse(value).map((item) => {
           // console.log(item);
           if (item.length) {
             return fromList(item);
-          } 
-          else {
+          } else {
             return generateSinusGraphData(10);
           }
         });
@@ -60,7 +71,7 @@ export default function DashboardScreen() {
       if (value !== null) {
         // console.log(value);
         // console.log(JSON.parse(value));
-        const pvalue: string[] = (JSON.parse(value)).map((item) => (typeMap[item]));
+        const pvalue: string[] = JSON.parse(value).map((item) => typeMap[item]);
         // console.log(pvalue);
         // value previously stored
         setGraphTitles(pvalue);
@@ -70,6 +81,30 @@ export default function DashboardScreen() {
       console.log(e);
     }
   };
+
+  // const test = new Date("2025-02-27 13:07");
+
+  // const data = [
+  //   { date: new Date(test.getTime()), value: 15 },
+  //   { date: new Date(test.getTime() + 60_000), value: 10 },
+  //   { date: new Date(test.getTime() + 120_000), value: 12 },
+  //   { date: new Date(test.getTime() + 180_000), value: 7 },
+  //   { date: new Date(test.getTime() + 240_000), value: 6 },
+  //   { date: new Date(test.getTime() + 300_000), value: 3 },
+  //   { date: new Date(test.getTime() + 360_000), value: 5 },
+  //   { date: new Date(test.getTime() + 420_000), value: 8 },
+  //   { date: new Date(test.getTime() + 480_000), value: 12 },
+  //   { date: new Date(test.getTime() + 540_000), value: 14 },
+  //   { date: new Date(test.getTime() + 600_000), value: 12 },
+  //   { date: new Date(test.getTime() + 660_000), value: 13.5 },
+  //   { date: new Date(test.getTime() + 720_000), value: 18 },
+  //   { date: new Date(test.getTime() + 780_000), value: 12 },
+  //   { date: new Date(test.getTime() + 840_000), value: 14 },
+  //   { date: new Date(test.getTime() + 900_000), value: 12 },
+  //   { date: new Date(test.getTime() + 960_000), value: 13.5 },
+  //   { date: new Date(test.getTime() + 1020_000), value: 69 },
+  //   { date: new Date(test.getTime() + 1080_000), value: 18 },
+  // ];
 
   return (
     <GestureHandlerRootView>
@@ -89,9 +124,25 @@ export default function DashboardScreen() {
         <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
           <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
         </TouchableOpacity>
-        {graphTitles.map((prop, key) => (
-          <GraphView key={key} title={prop} graphPoints={graphPoints[key]}></GraphView>
-        ))}
+        {graphTitles.map((prop, key) => {
+          const minmax = function (points) {
+            const values = points.map((item) => item.value);
+            let portionMax = (Math.max(...values) - Math.min(...values)) * 0.15;
+            return {
+              min: Math.min(...values) - portionMax,
+              max: Math.max(...values) + portionMax,
+            };
+          };
+          console.log(minmax(graphPoints[key]));
+          return (
+            <ChartView
+              key={key}
+              title={prop}
+              data={graphPoints[key]}
+              yDomain={minmax(graphPoints[key])}
+            ></ChartView>
+          );
+        })}
       </ParallaxScrollView>
     </GestureHandlerRootView>
   );

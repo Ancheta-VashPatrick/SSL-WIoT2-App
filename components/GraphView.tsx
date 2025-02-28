@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { View, type ViewProps } from "react-native";
 
-import { LineGraph, GraphPoint } from "react-native-graph";
+// import { LineGraph, GraphPoint } from "react-native-graph";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { generateSinusGraphData } from "@/app/data";
 
 export type GraphViewProps = ViewProps & {
   title: string;
-  graphPoints: GraphPoint[];
+  // graphPoints: GraphPoint[];
 };
 
 export function GraphView({
   style,
   title,
-  graphPoints,
+  // graphPoints,
   ...otherProps
 }: GraphViewProps) {
-  const [graphLabel, setGraphLabel] = useState(graphPoints.at(-1).value);
+  // const [graphLabel, setGraphLabel] = useState(graphPoints.at(-1).value);
 
   return (
     <ThemedView
@@ -30,9 +30,9 @@ export function GraphView({
       ]}
     >
       <ThemedText type="subtitle">
-        {title} ({graphLabel.toPrecision(2)})
+        {/* {title} ({graphLabel.toPrecision(2)}) */}
       </ThemedText>
-      <LineGraph
+      {/* <LineGraph
         style={[
           {
             alignSelf: "center",
@@ -52,7 +52,7 @@ export function GraphView({
         color={"#A1CEDC"}
         points={graphPoints}
         // BottomAxisLabel={() => <ThemedText>WAH</ThemedText>}
-      />
+      /> */}
     </ThemedView>
   );
 }

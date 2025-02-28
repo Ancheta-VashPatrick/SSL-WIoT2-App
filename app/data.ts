@@ -1,6 +1,6 @@
-import { GraphPoint } from "react-native-graph";
+import { Element } from "@/components/ChartView";
 
-export function generateSinusGraphData(length: number): GraphPoint[] {
+export function generateSinusGraphData(length: number): Element[] {
     return Array<number>(length)
       .fill(0)
       .map((_, index) => ({
@@ -9,7 +9,7 @@ export function generateSinusGraphData(length: number): GraphPoint[] {
       }))
   }
 
-  export function fromList(a): GraphPoint[] {
+  export function fromList(a): Element[] {
     return Array<number>(a.length)
       .fill(0)
       .map((_, index) => ({

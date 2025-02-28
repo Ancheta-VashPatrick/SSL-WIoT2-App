@@ -14,154 +14,159 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useEffect, useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
-import useBLE from "@/hooks/useBLE";
+// import useBLE from "@/hooks/useBLE";
 
 import useRequests from "@/hooks/useRequests";
 
 export default function CollectScreen() {
-  const {
-    allDevices,
-    connectedDevice,
-    connectToDevice,
-    disconnectDevice,
-    scanForPeripherals,
-    color,
-    requestPermissions,
-    portTypes,
-    readVals,
-  } = useBLE();
+  if (Platform.OS == "android" || Platform.OS == "ios") {
+    console.log("asdasdsa");
+    const { successfulUploads, uploadData } = useRequests();
 
-  const { successfulUploads, uploadData } = useRequests();
+    const {
+      allDevices,
+      connectedDevice,
+      connectToDevice,
+      disconnectDevice,
+      scanForPeripherals,
+      color,
+      requestPermissions,
+      portTypes,
+      readVals,
+    } = require("../../hooks/useBLE");
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const scanForDevices = async () => {
-    const isPermissionsEnabled = await requestPermissions();
-    if (isPermissionsEnabled) {
-      scanForPeripherals();
-    }
-  };
-
-  const hideModal = () => {
-    setIsModalVisible(false);
-  };
-
-  const openModal = async () => {
-    scanForDevices();
-    setIsModalVisible(true);
-  };
-
-  const typeMap: { [key: string]: any } = {
-    flow: "Flow",
-    temp: "Temperature",
-    turb: "Turbidity",
-    ph: "pH",
-  };
-
-  const item = ({ item }) => (
-    <ThemedView style={{ flexDirection: "row" }}>
-      <ThemedView style={{ width: 200, backgroundColor: "lightyellow" }}>
-        <ThemedText
-          style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
-        >
-          {/* {JSON.stringify(item.date)} */}
-          {item
-            ? `${item.date
-                .getFullYear()
-                .toString()
-                .padStart(4, "0")}-${item.date
-                .getMonth()
-                .toString()
-                .padStart(2, "0")}-${item.date
-                .getDate()
-                .toString()
-                .padStart(2, "0")} ${item.date
-                .getHours()
-                .toString()
-                .padStart(2, "0")}:${item.date
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`
-            : ""}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={{ width: 100, backgroundColor: "lightpink" }}>
-        <ThemedText
-          style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
-        >
-          {JSON.stringify(item.value)}
-        </ThemedText>
-      </ThemedView>
-    </ThemedView>
-  );
-
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
-      headerImage={
-        <IconSymbol
-          size={300}
-          color="#808080"
-          name="tray.and.arrow.down.fill"
-          style={styles.headerImage}
-        />
+    const scanForDevices = async () => {
+      const isPermissionsEnabled = await requestPermissions();
+      if (isPermissionsEnabled) {
+        scanForPeripherals();
       }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Collect</ThemedText>
+    };
+
+    const hideModal = () => {
+      setIsModalVisible(false);
+    };
+
+    const openModal = async () => {
+      scanForDevices();
+      setIsModalVisible(true);
+    };
+
+    const typeMap: { [key: string]: any } = {
+      flow: "Flow",
+      temp: "Temperature",
+      turb: "Turbidity",
+      ph: "pH",
+    };
+
+    const item = ({ item }) => (
+      <ThemedView style={{ flexDirection: "row" }}>
+        <ThemedView style={{ width: 200, backgroundColor: "lightyellow" }}>
+          <ThemedText
+            style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
+          >
+            {/* {JSON.stringify(item.date)} */}
+            {item
+              ? `${item.date
+                  .getFullYear()
+                  .toString()
+                  .padStart(4, "0")}-${item.date
+                  .getMonth()
+                  .toString()
+                  .padStart(2, "0")}-${item.date
+                  .getDate()
+                  .toString()
+                  .padStart(2, "0")} ${item.date
+                  .getHours()
+                  .toString()
+                  .padStart(2, "0")}:${item.date
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}`
+              : ""}
+          </ThemedText>
+        </ThemedView>
+        <ThemedView style={{ width: 100, backgroundColor: "lightpink" }}>
+          <ThemedText
+            style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
+          >
+            {JSON.stringify(item.value)}
+          </ThemedText>
+        </ThemedView>
       </ThemedView>
+    );
 
-      {connectedDevice ? (
-        <>
-          {readVals.map((prop, key) => (
-            <ThemedView
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              key={key}
-            >
-              <ThemedText>
-                {portTypes[key] === null ? "" : typeMap[portTypes[key]]}
-              </ThemedText>
-              <FlatList
-                data={prop}
-                renderItem={item}
-                scrollEnabled={false}
-                extraData={portTypes}
-              />
-            </ThemedView>
-          ))}
-          <ThemedText>{/* {`\n${tempVals[0].date}`} */}</ThemedText>
-        </>
-      ) : (
-        <ThemedText>Please connect the ESP32-WIOT2</ThemedText>
-      )}
-
-      <TouchableOpacity
-        onPress={connectedDevice ? disconnectDevice : openModal}
-        style={styles.ctaButton}
+    return (
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+        headerImage={
+          <IconSymbol
+            size={300}
+            color="#808080"
+            name="tray.and.arrow.down.fill"
+            style={styles.headerImage}
+          />
+        }
       >
-        <ThemedText style={styles.ctaButtonText}>
-          {connectedDevice ? "Disconnect" : "Connect"}
-        </ThemedText>
-      </TouchableOpacity>
+        <ThemedView style={styles.titleContainer}>
+          <ThemedText type="title">Collect</ThemedText>
+        </ThemedView>
 
-      <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
-        <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
-      </TouchableOpacity>
+        {connectedDevice ? (
+          <>
+            {readVals.map((prop, key) => (
+              <ThemedView
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                key={key}
+              >
+                <ThemedText>
+                  {portTypes[key] === null ? "" : typeMap[portTypes[key]]}
+                </ThemedText>
+                <FlatList
+                  data={prop}
+                  renderItem={item}
+                  scrollEnabled={false}
+                  extraData={portTypes}
+                />
+              </ThemedView>
+            ))}
+            <ThemedText>{`\n${tempVals[0].date}`}</ThemedText>
+          </>
+        ) : (
+          <ThemedText>Please connect the ESP32-WIOT2</ThemedText>
+        )}
 
-      {/* <ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText> */}
+        <TouchableOpacity
+          onPress={connectedDevice ? disconnectDevice : openModal}
+          style={styles.ctaButton}
+        >
+          <ThemedText style={styles.ctaButtonText}>
+            {connectedDevice ? "Disconnect" : "Connect"}
+          </ThemedText>
+        </TouchableOpacity>
 
-      <DeviceModal
-        closeModal={hideModal}
-        visible={isModalVisible}
-        connectToPeripheral={connectToDevice}
-        devices={allDevices}
-      />
-    </ParallaxScrollView>
-  );
+        <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
+          <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
+        </TouchableOpacity>
+
+        {<ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText>}
+
+        <DeviceModal
+          closeModal={hideModal}
+          visible={isModalVisible}
+          connectToPeripheral={connectToDevice}
+          devices={allDevices}
+        />
+      </ParallaxScrollView>
+    );
+  } else {
+    return <></>;
+  }
 }
 
 const styles = StyleSheet.create({
