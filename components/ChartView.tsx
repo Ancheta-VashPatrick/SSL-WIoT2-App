@@ -9,9 +9,10 @@ import {
   ChartDataPoint,
   HorizontalAxis,
   Line,
-  Tooltip,
+  // Tooltip,
   VerticalAxis,
 } from "react-native-responsive-linechart";
+import { Tooltip } from "@/components/ChartViewTooltip";
 import { Colors } from "@/constants/Colors";
 import React from "react";
 
@@ -28,6 +29,7 @@ interface Domain {
 export type ChartViewProps = ViewProps & {
   title: string;
   data: Element[];
+  xDomain: Domain;
   yDomain: Domain;
 };
 
@@ -35,6 +37,7 @@ export function ChartView({
   style,
   title,
   data,
+  xDomain,
   yDomain,
   ...otherProps
 }: ChartViewProps) {
@@ -53,7 +56,7 @@ export function ChartView({
           style={{ height: 200, width: 400 }}
           data={procData}
           padding={{ left: 40, bottom: 20, right: 20, top: 20 }}
-          // xDomain={{ min: -2, max: 10 }}
+          xDomain={{ min: xDomain.min, max: xDomain.max }}
           yDomain={{ min: yDomain.min, max: yDomain.max }}
           // viewport={{ size: { width: 5 } }}
         >
@@ -117,7 +120,16 @@ export function ChartView({
             }}
           />
           <Line
-            tooltipComponent={<Tooltip />}
+            tooltipComponent={
+              <Tooltip
+                theme={{
+                  formatter: (v) => {
+                    // return `${date.getMonth().toLocaleString()} ${date.getDate()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+                    return v.y.toFixed(2);
+                  },
+                }}
+              />
+            }
             theme={{
               stroke: { color: "#44bd32", width: 5 },
               scatter: {

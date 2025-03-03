@@ -125,21 +125,28 @@ export default function DashboardScreen() {
           <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
         </TouchableOpacity>
         {graphTitles.map((prop, key) => {
-          const minmax = function (points) {
-            const values = points.map((item) => item.value);
-            let portionMax = (Math.max(...values) - Math.min(...values)) * 0.15;
+          const minmax = function (values: number[], portion: number, ratio: number=1) {
+            let portionMax =
+              (Math.max(...values) - Math.min(...values)) * portion;
             return {
-              min: Math.min(...values) - portionMax,
+              min: Math.min(...values) - (portionMax * ratio),
               max: Math.max(...values) + portionMax,
             };
           };
-          console.log(minmax(graphPoints[key]));
           return (
             <ChartView
               key={key}
               title={prop}
               data={graphPoints[key]}
-              yDomain={minmax(graphPoints[key])}
+              xDomain={minmax(
+                graphPoints[key].map((item) => item.date.getTime() / 60_000),
+                0.12,
+                0.8
+              )}
+              yDomain={minmax(
+                graphPoints[key].map((item) => item.value),
+                0.3
+              )}
             ></ChartView>
           );
         })}
