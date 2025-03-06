@@ -124,12 +124,17 @@ export default function DashboardScreen() {
         <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
           <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
         </TouchableOpacity>
+
         {graphTitles.map((prop, key) => {
-          const minmax = function (values: number[], portion: number, ratio: number=1) {
+          const minmax = function (
+            values: number[],
+            portion: number,
+            ratio: number = 1
+          ) {
             let portionMax =
               (Math.max(...values) - Math.min(...values)) * portion;
             return {
-              min: Math.min(...values) - (portionMax * ratio),
+              min: Math.min(...values) - portionMax * ratio,
               max: Math.max(...values) + portionMax,
             };
           };
