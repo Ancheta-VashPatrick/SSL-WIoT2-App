@@ -34,9 +34,9 @@ function useBLE() {
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [color, setColor] = useState("white");
 
-  const [portTypes, setPortTypes] = useState<(string | null)[]>([null, null, null, null]);
+  const [blePortTypes, setBlePortTypes] = useState<(string | null)[]>([null, null, null, null]);
   const [tempTypes, setTempTypes] = useState<(string | null)[]>([null, null, null, null]);
-  const [readVals, setReadVals] = useState<Element[][]>([[], [], [], []]);
+  const [bleReadVals, setBleReadVals] = useState<Element[][]>([[], [], [], []]);
 
   const [clearReadInterval, setClearReadInterval] = useState(() => {return () => {return () => {}}});
 
@@ -211,8 +211,8 @@ function useBLE() {
         await readPort(device, i);
         // console.log(i);
       }
-      setTempTypes(portTypes);
-    }, 3000);
+      setTempTypes(blePortTypes);
+    }, 7000);
 
     setClearReadInterval(() => {return () => clearInterval(interval)});
 
@@ -244,69 +244,73 @@ function useBLE() {
         console.log(error);
       }
       if (rawVal) {
-        const readVal = rawVal.slice(5, -1);
-        console.log(rawVal);
-        let rawPortType = rawVal.slice(0, 4);
-        const portType =
-          rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
-        // console.log(portType);
-
-        const TZ_OFFSET = 8;
-
-        let readValsBuffer = new Array();
-
-        let start = 8;
-        let end = (portType == "flow") ? 21 : 19;
-
-        let currDate = new Date(
-          `${readVal.substring(0, 4)}-${readVal.substring(
-            4,
-            6
-          )}-${readVal.substring(6, 8)}`
-        );
-        while (end < readVal.length) {
-          if (readVal.charAt(start - 1) === "|") {
-            currDate = new Date(currDate.getTime() + 86400000);
+        try {
+          const readVal = rawVal.slice(5, -1);
+          console.log(rawVal);
+          let rawPortType = rawVal.slice(0, 4);
+          const portType =
+            rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
+          // console.log(portType);
+  
+          const TZ_OFFSET = 8;
+  
+          let readValsBuffer = new Array();
+  
+          let start = 8;
+          let end = (portType == "flow") ? 21 : 19;
+  
+          let currDate = new Date(
+            `${readVal.substring(0, 4)}-${readVal.substring(
+              4,
+              6
+            )}-${readVal.substring(6, 8)}`
+          );
+          while (end < readVal.length) {
+            if (readVal.charAt(start - 1) === "|") {
+              currDate = new Date(currDate.getTime() + 86400000);
+            }
+  
+            readValsBuffer.push({
+              date: new Date(
+                currDate.getTime() +
+                  parseInt(readVal.substring(start, start + 2)) * 3600000 +
+                  parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
+                  TZ_OFFSET * 3600000
+              ),
+              value: parseFloat(
+                readVal.substring(start + (portType == "flow" ? 7 : 4), end)
+              ),
+            });
+            if (portType == "flow") {
+              // console.log(rawVal);
+              // console.log(readValsBuffer);
+              start += 15;
+              end += 15;
+            } else {
+              start += 12;
+              end += 12;
+            }
           }
-
-          readValsBuffer.push({
-            date: new Date(
-              currDate.getTime() +
-                parseInt(readVal.substring(start, start + 2)) * 3600000 +
-                parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
-                TZ_OFFSET * 3600000
-            ),
-            value: parseFloat(
-              readVal.substring(start + (portType == "flow" ? 7 : 4), end)
-            ),
-          });
-          if (portType == "flow") {
-            // console.log(rawVal);
-            // console.log(readValsBuffer);
-            start += 15;
-            end += 15;
-          } else {
-            start += 12;
-            end += 12;
-          }
+          
+          let oldTypes = blePortTypes;
+          oldTypes[portNumber] = portType;
+          setBlePortTypes(oldTypes);
+          let oldVals = bleReadVals;
+          oldVals[portNumber] = readValsBuffer;
+          setBleReadVals(oldVals);
+          // console.log(rawVal);
+        } catch (error) {
+          console.log(error)
         }
-        
-        let oldTypes = portTypes;
-        oldTypes[portNumber] = portType;
-        setPortTypes(oldTypes);
-        let oldVals = readVals;
-        oldVals[portNumber] = readValsBuffer;
-        setReadVals(oldVals);
-        // console.log(rawVal);
         
         try {
           await AsyncStorage.setItem(
             "port-types",
-            JSON.stringify(portTypes)
+            JSON.stringify(blePortTypes)
           );
           await AsyncStorage.setItem(
             "read-vals",
-            JSON.stringify(readVals)
+            JSON.stringify(bleReadVals)
           );
         } catch (e) {
           // saving error
@@ -326,9 +330,10 @@ function useBLE() {
     color,
     requestPermissions,
     toggleLED,
-    portTypes,
-    readVals,
+    blePortTypes,
+    bleReadVals,
   };
 }
 
-export default useBLE;
+// export default useBLE;
+module.exports = { useBLE };

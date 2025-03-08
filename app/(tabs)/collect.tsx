@@ -20,8 +20,9 @@ import useRequests from "@/hooks/useRequests";
 
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
-    console.log("asdasdsa");
     const { successfulUploads, uploadData } = useRequests();
+
+    const useBLE = require('../../hooks/useBLE').useBLE;
 
     const {
       allDevices,
@@ -29,11 +30,10 @@ export default function CollectScreen() {
       connectToDevice,
       disconnectDevice,
       scanForPeripherals,
-      color,
       requestPermissions,
-      portTypes,
-      readVals,
-    } = require("../../hooks/useBLE");
+      blePortTypes,
+      bleReadVals,
+    } = useBLE();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -115,7 +115,7 @@ export default function CollectScreen() {
 
         {connectedDevice ? (
           <>
-            {readVals.map((prop, key) => (
+            {bleReadVals.map((prop, key) => (
               <ThemedView
                 style={{
                   flex: 1,
@@ -125,17 +125,17 @@ export default function CollectScreen() {
                 key={key}
               >
                 <ThemedText>
-                  {portTypes[key] === null ? "" : typeMap[portTypes[key]]}
+                  {blePortTypes[key] === null ? "" : typeMap[blePortTypes[key]]}
                 </ThemedText>
                 <FlatList
                   data={prop}
                   renderItem={item}
                   scrollEnabled={false}
-                  extraData={portTypes}
+                  extraData={bleReadVals}
                 />
               </ThemedView>
             ))}
-            <ThemedText>{`\n${tempVals[0].date}`}</ThemedText>
+            {/* <ThemedText>{`\n${tempVals[0].date}`}</ThemedText> */}
           </>
         ) : (
           <ThemedText>Please connect the ESP32-WIOT2</ThemedText>
