@@ -1,4 +1,10 @@
-import { Image, StyleSheet, Platform, TouchableOpacity } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -22,7 +28,7 @@ export default function DashboardScreen() {
     skipPollingIfUnfocused: true,
   });
 
-  console.log(JSON.stringify({data, error, isLoading}))
+  console.log(JSON.stringify({ data, error, isLoading }));
 
   const sensorData = useSelector((state) => state.sensorData);
 
@@ -119,58 +125,61 @@ export default function DashboardScreen() {
         </TouchableOpacity>
 
         {/* {error ? <ThemedText>{JSON.stringify(error)}</ThemedText> : isLoading ? <ThemedText>Loading</ThemedText> : <ThemedText>{JSON.stringify(data)}</ThemedText>} */}
-
-        {sensorData.portTypes.length ? (
-          sensorData.portTypes.map((prop, key) => {
-            let recentData = sensorData.readVals[key];
-            if (recentData.length) {
-              const lastDate = recentData.at(-1).date;
-              recentData = recentData
-                .filter(
-                  (readVal) =>
-                    new Date(lastDate).getTime() -
-                      new Date(readVal.date).getTime() <=
-                    720_000
-                )
-                .slice(-Math.min(recentData.length, 20));
-            }
-            const minmax = function (
-              values: number[],
-              portion: number,
-              ratio: number = 1
-            ) {
-              let portionMax =
-                (Math.max(...values) - Math.min(...values)) * portion;
-              return {
-                min: Math.min(...values) - portionMax * ratio,
-                max: Math.max(...values) + portionMax,
+        <ThemedView style={styles.graphContainer}>
+          {sensorData.portTypes.length ? (
+            sensorData.portTypes.map((prop, key) => {
+              let recentData = sensorData.readVals[key];
+              if (recentData.length) {
+                const lastDate = recentData.at(-1).date;
+                recentData = recentData
+                  .filter(
+                    (readVal) =>
+                      new Date(lastDate).getTime() -
+                        new Date(readVal.date).getTime() <=
+                      720_000
+                  )
+                  .slice(-Math.min(recentData.length, 20));
+              }
+              const minmax = function (
+                values: number[],
+                portion: number,
+                ratio: number = 1
+              ) {
+                let portionMax =
+                  (Math.max(...values) - Math.min(...values)) * portion;
+                return {
+                  min: Math.min(...values) - portionMax * ratio,
+                  max: Math.max(...values) + portionMax,
+                };
               };
-            };
-            return (
-              <ChartView
-                key={key}
-                title={typeMap[prop]}
-                data={recentData.map((readVal) => ({
-                  date: new Date(readVal.date),
-                  value: parseFloat(readVal.value),
-                }))}
-                xDomain={minmax(
-                  recentData.map(
-                    (item) => new Date(item.date).getTime() / 60_000
-                  ),
-                  0.14,
-                  0.8
-                )}
-                yDomain={minmax(
-                  recentData.map((item) => item.value),
-                  0.3
-                )}
-              ></ChartView>
-            );
-          })
-        ) : (
-          <ThemedText type="subtitle">No Data Available</ThemedText>
-        )}
+              return (
+                <ThemedView style={styles.graphItem}>
+                  <ChartView
+                    key={key}
+                    title={typeMap[prop]}
+                    data={recentData.map((readVal) => ({
+                      date: new Date(readVal.date),
+                      value: parseFloat(readVal.value),
+                    }))}
+                    xDomain={minmax(
+                      recentData.map(
+                        (item) => new Date(item.date).getTime() / 60_000
+                      ),
+                      0.14,
+                      0.8
+                    )}
+                    yDomain={minmax(
+                      recentData.map((item) => item.value),
+                      0.3
+                    )}
+                  />
+                </ThemedView>
+              );
+            })
+          ) : (
+            <ThemedText type="subtitle">No Data Available</ThemedText>
+          )}
+        </ThemedView>
         {/* <ThemedText>
           {error ? (
             <>{JSON.stringify(error)}</>
@@ -184,6 +193,9 @@ export default function DashboardScreen() {
     </GestureHandlerRootView>
   );
 }
+
+const { width, height } = Dimensions.get("window");
+// const screenDimensions = Dimensions.get('screen');
 
 const styles = StyleSheet.create({
   titleContainer: {
@@ -207,6 +219,19 @@ const styles = StyleSheet.create({
     width: "100%",
     aspectRatio: 1.4,
     marginVertical: 20,
+  },
+  graphContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  graphItem: {
+    maxWidth: Math.min(0.875 * width, 0.6 * height),
+    padding: 20,
+    flexGrow: 1,
+    // maxWidth: 550,
   },
   ctaButton: {
     backgroundColor: "#FF6060",

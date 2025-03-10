@@ -66,7 +66,7 @@ export function ChartView({
           </ThemedText>
         ) : (
           <Chart
-            style={{ height: 200, width: 400 }}
+            style={{ height: 200, width: "100%"}}
             data={procData}
             padding={{ left: 40, bottom: 20, right: 20, top: 20 }}
             xDomain={{ min: xDomain.min, max: xDomain.max }}
