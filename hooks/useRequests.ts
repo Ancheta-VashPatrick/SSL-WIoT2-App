@@ -4,8 +4,6 @@ import { fetch } from "expo/fetch";
 import { useState } from "react";
 
 function useRequests() {
-  const [successfulUploads, setSuccessfulUploads] = useState(0);
-
   const url = "http://10.158.66.62:3000/sensor-data";
   async function createEntry(data) {
     // console.log("start");
@@ -22,7 +20,7 @@ function useRequests() {
 
     if (newData.message == "Sensor data record created successfully") {
       // console.log("WOOP");
-      setSuccessfulUploads(successfulUploads + 1);
+      // setSuccessfulUploads(successfulUploads + 1);
     }
 
     return newData;
@@ -39,7 +37,7 @@ function useRequests() {
 
   const uploadData = async () => {
     try {
-      setSuccessfulUploads(0);
+      // setSuccessfulUploads(0);
 
       const rawPortTypes = await AsyncStorage.getItem("port-types");
       const rawReadVals = await AsyncStorage.getItem("read-vals");
@@ -85,7 +83,7 @@ function useRequests() {
     }
   };
 
-  return { successfulUploads, uploadData };
+  return { uploadData };
 }
 
 export default useRequests;

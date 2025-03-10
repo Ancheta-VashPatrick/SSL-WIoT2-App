@@ -1,37 +1,30 @@
 import { Image, StyleSheet, Platform, TouchableOpacity } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { fromList, generateSinusGraphData } from "../data";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useState } from "react";
-import useBLE from "@/hooks/useBLE";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Element } from "@/components/ChartView";
 
-import {
-  Chart,
-  VerticalAxis,
-  HorizontalAxis,
-  Line,
-  Tooltip,
-  Area,
-} from "react-native-responsive-linechart";
-
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { ChartView } from "@/components/ChartView";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { useGetDataByNodeIdQuery } from "@/services/server";
+import { setType } from "@/store/reducers";
+
 export default function DashboardScreen() {
-  const [graphTitles, setGraphTitles] = useState(["", "", "", ""]);
-  const [graphPoints, setGraphPoints] = useState([
-    generateSinusGraphData(10),
-    generateSinusGraphData(20),
-    generateSinusGraphData(30),
-    generateSinusGraphData(40),
-  ]);
+  const { data, error, isLoading } = useGetDataByNodeIdQuery("coe199node", {
+    pollingInterval: 3000,
+    skipPollingIfUnfocused: true,
+  });
+
+  console.log(JSON.stringify({data, error, isLoading}))
+
+  const sensorData = useSelector((state) => state.sensorData);
 
   const typeMap: { [key: string]: any } = {
     flow: "Flow",
@@ -43,43 +36,43 @@ export default function DashboardScreen() {
   const refreshGraph = async function () {
     // console.log("Test");
     // console.log(graphPoints);
-    try {
-      const value = await AsyncStorage.getItem("read-vals");
-      if (value !== null) {
-        // console.log(value);
-        // console.log(JSON.parse(value));
-        const pvalue: Element[][] = JSON.parse(value).map((item) => {
-          // console.log(item);
-          if (item.length) {
-            return fromList(item);
-          } else {
-            return generateSinusGraphData(10);
-          }
-        });
-        // const pvalue: GraphPoint[] = new Array(JSON.parse(value));
-        // console.log(pvalue);
-        // console.log(pvalue.at(-1)?.date);
-        // value previously stored
-        setGraphPoints(pvalue);
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
-    try {
-      const value = await AsyncStorage.getItem("port-types");
-      if (value !== null) {
-        // console.log(value);
-        // console.log(JSON.parse(value));
-        const pvalue: string[] = JSON.parse(value).map((item) => typeMap[item]);
-        // console.log(pvalue);
-        // value previously stored
-        setGraphTitles(pvalue);
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
+    // try {
+    //   const value = await AsyncStorage.getItem("read-vals");
+    //   if (value !== null) {
+    //     // console.log(value);
+    //     // console.log(JSON.parse(value));
+    //     const pvalue: Element[][] = JSON.parse(value).map((item) => {
+    //       // console.log(item);
+    //       if (item.length) {
+    //         return fromList(item);
+    //       } else {
+    //         return generateSinusGraphData(10);
+    //       }
+    //     });
+    //     // const pvalue: GraphPoint[] = new Array(JSON.parse(value));
+    //     // console.log(pvalue);
+    //     // console.log(pvalue.at(-1)?.date);
+    //     // value previously stored
+    //     setGraphPoints(pvalue);
+    //   }
+    // } catch (e) {
+    //   // error reading value
+    //   console.log(e);
+    // }
+    // try {
+    //   const value = await AsyncStorage.getItem("port-types");
+    //   if (value !== null) {
+    //     // console.log(value);
+    //     // console.log(JSON.parse(value));
+    //     const pvalue: string[] = JSON.parse(value).map((item) => typeMap[item]);
+    //     // console.log(pvalue);
+    //     // value previously stored
+    //     setGraphTitles(pvalue);
+    //   }
+    // } catch (e) {
+    //   // error reading value
+    //   console.log(e);
+    // }
   };
 
   // const test = new Date("2025-02-27 13:07");
@@ -125,36 +118,68 @@ export default function DashboardScreen() {
           <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
         </TouchableOpacity>
 
-        {graphTitles.map((prop, key) => {
-          const minmax = function (
-            values: number[],
-            portion: number,
-            ratio: number = 1
-          ) {
-            let portionMax =
-              (Math.max(...values) - Math.min(...values)) * portion;
-            return {
-              min: Math.min(...values) - portionMax * ratio,
-              max: Math.max(...values) + portionMax,
+        {/* {error ? <ThemedText>{JSON.stringify(error)}</ThemedText> : isLoading ? <ThemedText>Loading</ThemedText> : <ThemedText>{JSON.stringify(data)}</ThemedText>} */}
+
+        {sensorData.portTypes.length ? (
+          sensorData.portTypes.map((prop, key) => {
+            let recentData = sensorData.readVals[key];
+            if (recentData.length) {
+              const lastDate = recentData.at(-1).date;
+              recentData = recentData
+                .filter(
+                  (readVal) =>
+                    new Date(lastDate).getTime() -
+                      new Date(readVal.date).getTime() <=
+                    720_000
+                )
+                .slice(-Math.min(recentData.length, 20));
+            }
+            const minmax = function (
+              values: number[],
+              portion: number,
+              ratio: number = 1
+            ) {
+              let portionMax =
+                (Math.max(...values) - Math.min(...values)) * portion;
+              return {
+                min: Math.min(...values) - portionMax * ratio,
+                max: Math.max(...values) + portionMax,
+              };
             };
-          };
-          return (
-            <ChartView
-              key={key}
-              title={prop}
-              data={graphPoints[key]}
-              xDomain={minmax(
-                graphPoints[key].map((item) => item.date.getTime() / 60_000),
-                0.12,
-                0.8
-              )}
-              yDomain={minmax(
-                graphPoints[key].map((item) => item.value),
-                0.3
-              )}
-            ></ChartView>
-          );
-        })}
+            return (
+              <ChartView
+                key={key}
+                title={typeMap[prop]}
+                data={recentData.map((readVal) => ({
+                  date: new Date(readVal.date),
+                  value: parseFloat(readVal.value),
+                }))}
+                xDomain={minmax(
+                  recentData.map(
+                    (item) => new Date(item.date).getTime() / 60_000
+                  ),
+                  0.14,
+                  0.8
+                )}
+                yDomain={minmax(
+                  recentData.map((item) => item.value),
+                  0.3
+                )}
+              ></ChartView>
+            );
+          })
+        ) : (
+          <ThemedText type="subtitle">No Data Available</ThemedText>
+        )}
+        {/* <ThemedText>
+          {error ? (
+            <>{JSON.stringify(error)}</>
+          ) : isLoading ? (
+            <>Loading...</>
+          ) : data ? (
+            <>{JSON.stringify(data)}</>
+          ) : null}
+        </ThemedText> */}
       </ParallaxScrollView>
     </GestureHandlerRootView>
   );
