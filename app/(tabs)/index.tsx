@@ -39,6 +39,8 @@ export default function DashboardScreen() {
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const dimensionRatio = windowWidth / windowHeight;
+  const widthDivisions = Math.floor(dimensionRatio / 1.4) + 1
+  const widthPortion = 100 / widthDivisions;
 
   const styles = StyleSheet.create({
     titleContainer: {
@@ -64,14 +66,15 @@ export default function DashboardScreen() {
       marginVertical: 20,
     },
     graphContainer: {
-      flex: 1,
+      flex: widthDivisions,
       flexDirection: "row",
       flexWrap: "wrap",
       alignItems: "center",
       justifyContent: "center",
     },
     graphItem: {
-      width: (dimensionRatio > 1.25) ? "50%" : "100%",
+      width: `${widthPortion}%`,
+      maxWidth: `${widthPortion}%`,
       padding: 20,
       flexGrow: 1,
     },
