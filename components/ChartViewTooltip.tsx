@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 import * as React from "react";
 import { Text, Rect } from "react-native-svg";
-import ChartContext from "./ChartContext";
+import ChartContext from "@/components/ChartContext";
 import {
   ChartDataPoint,
   Label,
