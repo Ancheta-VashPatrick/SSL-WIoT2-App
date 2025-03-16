@@ -18,15 +18,21 @@ import { ChartView } from "@/components/ChartView";
 import { useDispatch, useSelector } from "react-redux";
 
 import { useGetDataByNodeIdQuery } from "@/services/server";
-import { setType } from "@/store/reducers";
+import { Collapsible } from "@/components/Collapsible";
+// import { setType } from "@/store/reducers";
 
 export default function DashboardScreen() {
-  const { data, error, isLoading } = useGetDataByNodeIdQuery("coe199node", {
-    pollingInterval: 3000,
-    skipPollingIfUnfocused: true,
-  });
+  const headings = ["coe199node", "sn1"];
 
-  console.log(JSON.stringify({ data, error, isLoading }));
+  headings.forEach((item) => {
+    const { data, error, isLoading } = useGetDataByNodeIdQuery(item, {
+      pollingInterval: 3000,
+      skipPollingIfUnfocused: true,
+    });
+
+    console.log(JSON.stringify({ data, error, isLoading }));
+    console.log(item);
+  });
 
   const sensorData = useSelector((state) => state.sensorData);
 
@@ -39,7 +45,7 @@ export default function DashboardScreen() {
 
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const dimensionRatio = windowWidth / windowHeight;
-  const widthDivisions = Math.floor(dimensionRatio / 1.4) + 1
+  const widthDivisions = Math.floor(dimensionRatio / 1.4) + 1;
   const widthPortion = 100 / widthDivisions;
 
   const styles = StyleSheet.create({
@@ -94,6 +100,8 @@ export default function DashboardScreen() {
     },
   });
 
+  let i = 0;
+
   return (
     <GestureHandlerRootView>
       <ParallaxScrollView
@@ -107,65 +115,71 @@ export default function DashboardScreen() {
       >
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Dashboard</ThemedText>
-          {/* <HelloWave /> */}
         </ThemedView>
 
-        {/* {error ? <ThemedText>{JSON.stringify(error)}</ThemedText> : isLoading ? <ThemedText>Loading</ThemedText> : <ThemedText>{JSON.stringify(data)}</ThemedText>} */}
-        <ThemedView style={styles.graphContainer}>
-          {sensorData.portTypes.length ? (
-            sensorData.portTypes.map((prop, key) => {
-              let recentData = sensorData.readVals[key];
-              if (recentData.length) {
-                const lastDate = recentData.at(-1).date;
-                recentData = recentData
-                  .filter(
-                    (readVal) =>
-                      new Date(lastDate).getTime() -
-                        new Date(readVal.date).getTime() <=
-                      720_000
-                  )
-                  .slice(-Math.min(recentData.length, 20));
-              }
-              const minmax = function (
-                values: number[],
-                portion: number,
-                ratio: number = 1
-              ) {
-                let portionMax =
-                  (Math.max(...values) - Math.min(...values)) * portion;
-                return {
-                  min: Math.min(...values) - portionMax * ratio,
-                  max: Math.max(...values) + portionMax,
-                };
-              };
-              return (
-                <ThemedView style={styles.graphItem}>
-                  <ChartView
-                    key={key}
-                    title={typeMap[prop]}
-                    data={recentData.map((readVal) => ({
-                      date: new Date(readVal.date),
-                      value: parseFloat(readVal.value),
-                    }))}
-                    xDomain={minmax(
-                      recentData.map(
-                        (item) => new Date(item.date).getTime() / 60_000
-                      ),
-                      0.14,
-                      0.8
-                    )}
-                    yDomain={minmax(
-                      recentData.map((item) => item.value),
-                      0.3
-                    )}
-                  />
-                </ThemedView>
-              );
-            })
-          ) : (
-            <ThemedText type="subtitle">No Data Available</ThemedText>
-          )}
-        </ThemedView>
+        {sensorData.items.length ? (
+          sensorData.items.map((dataItem) => (
+            <Collapsible title={dataItem.title}>
+              <ThemedView style={styles.graphContainer}>
+                {dataItem.portTypes.length ? (
+                  dataItem.portTypes.map((prop, key) => {
+                    let recentData = dataItem.readVals[key];
+                    if (recentData.length) {
+                      const lastDate = recentData.at(-1).date;
+                      recentData = recentData
+                        .filter(
+                          (readVal) =>
+                            new Date(lastDate).getTime() -
+                              new Date(readVal.date).getTime() <=
+                            720_000
+                        )
+                        .slice(-Math.min(recentData.length, 20));
+                    }
+                    const minmax = function (
+                      values: number[],
+                      portion: number,
+                      ratio: number = 1
+                    ) {
+                      let portionMax =
+                        (Math.max(...values) - Math.min(...values)) * portion;
+                      return {
+                        min: Math.min(...values) - portionMax * ratio,
+                        max: Math.max(...values) + portionMax,
+                      };
+                    };
+                    return (
+                      <ThemedView style={styles.graphItem}>
+                        <ChartView
+                          key={key}
+                          title={typeMap[prop]}
+                          data={recentData.map((readVal) => ({
+                            date: new Date(readVal.date),
+                            value: parseFloat(readVal.value),
+                          }))}
+                          xDomain={minmax(
+                            recentData.map(
+                              (item) => new Date(item.date).getTime() / 60_000
+                            ),
+                            0.14,
+                            0.8
+                          )}
+                          yDomain={minmax(
+                            recentData.map((item) => item.value),
+                            0.3
+                          )}
+                        />
+                      </ThemedView>
+                    );
+                  })
+                ) : (
+                  <ThemedText type="subtitle">No Data Available</ThemedText>
+                )}
+              </ThemedView>
+            </Collapsible>
+          ))
+        ) : (
+          <ThemedText type="subtitle">No Data Available</ThemedText>
+        )}
         {/* <ThemedText>
           {error ? (
             <>{JSON.stringify(error)}</>

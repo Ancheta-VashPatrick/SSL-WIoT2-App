@@ -6,15 +6,18 @@ import { createSlice } from "@reduxjs/toolkit";
 import { DataElement } from "@/services/data";
 import { serverApi } from "@/services/server";
 
-interface DataState {
+interface DataItem {
+  title: string;
   portTypes: (string | null)[];
   readVals: DataElement[][];
 }
 
+interface DataState {
+  items: DataItem[];
+}
+
 const initialState = {
-  // Define your initial state here
-  portTypes: [],
-  readVals: [],
+  items: [],
 } satisfies DataState as DataState;
 
 const sensorSlice = createSlice({
@@ -22,18 +25,36 @@ const sensorSlice = createSlice({
   initialState,
   reducers: {
     // Define your actions and reducers here
-    setType(state, action) {
-      state.portTypes[action.payload.index] = action.payload.newType;
-    },
+    // setType(state, action) {
+    //   state.portTypes[action.payload.index] = action.payload.newType;
+    // },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
       serverApi.endpoints.getDataByNodeId.matchFulfilled,
       (state, action) => {
-        const { data } = action.payload;
+        const { nodeId, data } = action.payload;
 
-        state.portTypes = data.map((item) => item.type);
-        state.readVals = data.map((item) => item.data);
+        let isPresent = false;
+
+        for (let i = 0; i < state.items.length; i++) {
+          if (state.items[i].title == nodeId) {
+            isPresent = true;
+            state.items[i] = {
+              title: nodeId,
+              portTypes: data.map((item) => item.type),
+              readVals: data.map((item) => item.data),
+            };
+          }
+        }
+
+        if (!isPresent) {
+          state.items.push({
+            title: nodeId,
+            portTypes: data.map((item) => item.type),
+            readVals: data.map((item) => item.data),
+          });
+        }
 
         console.log(data);
       }
@@ -55,7 +76,6 @@ const sensorSlice = createSlice({
   },
 });
 
-
 const persistConfig = {
   key: "root",
   storage,
@@ -66,6 +86,6 @@ const rootReducer = persistCombineReducers(persistConfig, {
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
-export const { setType } = sensorSlice.actions;
+// export const { setType } = sensorSlice.actions;
 
 export default rootReducer;

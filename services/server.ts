@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DataElement } from "@/services/data";
 
 interface GetData {
+  nodeId: string;
   data: { type: string; data: DataElement[] }[];
 }
 
