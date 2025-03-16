@@ -3,7 +3,7 @@ import {
   StyleSheet,
   Platform,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -105,6 +105,63 @@ export default function DashboardScreen() {
   //   { date: new Date(test.getTime() + 1080_000), value: 18 },
   // ];
 
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const dimensionRatio = windowWidth / windowHeight;
+  console.log(dimensionRatio);
+  // const screenDimensions = Dimensions.get('screen');
+
+  const styles = StyleSheet.create({
+    titleContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    stepContainer: {
+      gap: 8,
+      marginBottom: 8,
+    },
+    reactLogo: {
+      height: 178,
+      width: 290,
+      bottom: 0,
+      left: 0,
+      position: "absolute",
+    },
+    graph: {
+      alignSelf: "center",
+      width: "100%",
+      aspectRatio: 1.4,
+      marginVertical: 20,
+    },
+    graphContainer: {
+      flex: 1,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    graphItem: {
+      width: (dimensionRatio > 1.25) ? "50%" : "100%",
+      padding: 20,
+      flexGrow: 1,
+      // maxWidth: 550,
+    },
+    ctaButton: {
+      backgroundColor: "#FF6060",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 50,
+      marginHorizontal: 20,
+      marginBottom: 5,
+      borderRadius: 8,
+    },
+    ctaButtonText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      color: "white",
+    },
+  });
+
   return (
     <GestureHandlerRootView>
       <ParallaxScrollView
@@ -193,58 +250,3 @@ export default function DashboardScreen() {
     </GestureHandlerRootView>
   );
 }
-
-const { width, height } = Dimensions.get("window");
-// const screenDimensions = Dimensions.get('screen');
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-  graph: {
-    alignSelf: "center",
-    width: "100%",
-    aspectRatio: 1.4,
-    marginVertical: 20,
-  },
-  graphContainer: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  graphItem: {
-    maxWidth: Math.min(0.875 * width, 0.6 * height),
-    padding: 20,
-    flexGrow: 1,
-    // maxWidth: 550,
-  },
-  ctaButton: {
-    backgroundColor: "#FF6060",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 50,
-    marginHorizontal: 20,
-    marginBottom: 5,
-    borderRadius: 8,
-  },
-  ctaButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-  },
-});
