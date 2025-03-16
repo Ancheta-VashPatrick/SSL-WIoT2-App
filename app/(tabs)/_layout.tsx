@@ -9,69 +9,72 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
 import { Provider } from "react-redux";
-import store from "@/store/store";
+import { store, persistor } from "@/store/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <Provider store={store}>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-          headerShown: false,
-          tabBarButton: HapticTab,
-          tabBarBackground: TabBarBackground,
-          tabBarStyle: Platform.select({
-            ios: {
-              // Use a transparent background on iOS to show the blur effect
-              position: "absolute",
-            },
-            default: {},
-          }),
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Dashboard",
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="gauge" color={color} />
-            ),
+      <PersistGate loading={null} persistor={persistor}>
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+            headerShown: false,
+            tabBarButton: HapticTab,
+            tabBarBackground: TabBarBackground,
+            tabBarStyle: Platform.select({
+              ios: {
+                // Use a transparent background on iOS to show the blur effect
+                position: "absolute",
+              },
+              default: {},
+            }),
           }}
-        />
-        {Platform.OS == "android" || Platform.OS == "ios" ? (
+        >
           <Tabs.Screen
-            name="collect"
+            name="index"
             options={{
-              title: "Collect",
+              title: "Dashboard",
               tabBarIcon: ({ color }) => (
-                <IconSymbol
-                  size={28}
-                  name="tray.and.arrow.down.fill"
-                  color={color}
-                />
+                <IconSymbol size={28} name="gauge" color={color} />
               ),
             }}
           />
-        ) : (
+          {Platform.OS == "android" || Platform.OS == "ios" ? (
+            <Tabs.Screen
+              name="collect"
+              options={{
+                title: "Collect",
+                tabBarIcon: ({ color }) => (
+                  <IconSymbol
+                    size={28}
+                    name="tray.and.arrow.down.fill"
+                    color={color}
+                  />
+                ),
+              }}
+            />
+          ) : (
+            <Tabs.Screen
+              name="collect"
+              options={{
+                tabBarButton: () => null,
+              }}
+            />
+          )}
           <Tabs.Screen
-            name="collect"
+            name="options"
             options={{
-              tabBarButton: () => null,
+              title: "Options",
+              tabBarIcon: ({ color }) => (
+                <IconSymbol size={28} name="wrench.fill" color={color} />
+              ),
             }}
           />
-        )}
-        <Tabs.Screen
-          name="options"
-          options={{
-            title: "Options",
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="wrench.fill" color={color} />
-            ),
-          }}
-        />
-      </Tabs>
+        </Tabs>
+      </PersistGate>
     </Provider>
   );
 }
