@@ -4,7 +4,6 @@ import { View, type ViewProps } from "react-native";
 // import { LineGraph, GraphPoint } from "react-native-graph";
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
-import { generateSinusGraphData } from "@/app/data";
 
 export type GraphViewProps = ViewProps & {
   title: string;

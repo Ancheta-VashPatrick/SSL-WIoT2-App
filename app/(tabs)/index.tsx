@@ -9,11 +9,9 @@ import {
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { fromList, generateSinusGraphData } from "../data";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Element } from "@/components/ChartView";
 
 import { ChartView } from "@/components/ChartView";
 
@@ -39,76 +37,8 @@ export default function DashboardScreen() {
     ph: "pH",
   };
 
-  const refreshGraph = async function () {
-    // console.log("Test");
-    // console.log(graphPoints);
-    // try {
-    //   const value = await AsyncStorage.getItem("read-vals");
-    //   if (value !== null) {
-    //     // console.log(value);
-    //     // console.log(JSON.parse(value));
-    //     const pvalue: Element[][] = JSON.parse(value).map((item) => {
-    //       // console.log(item);
-    //       if (item.length) {
-    //         return fromList(item);
-    //       } else {
-    //         return generateSinusGraphData(10);
-    //       }
-    //     });
-    //     // const pvalue: GraphPoint[] = new Array(JSON.parse(value));
-    //     // console.log(pvalue);
-    //     // console.log(pvalue.at(-1)?.date);
-    //     // value previously stored
-    //     setGraphPoints(pvalue);
-    //   }
-    // } catch (e) {
-    //   // error reading value
-    //   console.log(e);
-    // }
-    // try {
-    //   const value = await AsyncStorage.getItem("port-types");
-    //   if (value !== null) {
-    //     // console.log(value);
-    //     // console.log(JSON.parse(value));
-    //     const pvalue: string[] = JSON.parse(value).map((item) => typeMap[item]);
-    //     // console.log(pvalue);
-    //     // value previously stored
-    //     setGraphTitles(pvalue);
-    //   }
-    // } catch (e) {
-    //   // error reading value
-    //   console.log(e);
-    // }
-  };
-
-  // const test = new Date("2025-02-27 13:07");
-
-  // const data = [
-  //   { date: new Date(test.getTime()), value: 15 },
-  //   { date: new Date(test.getTime() + 60_000), value: 10 },
-  //   { date: new Date(test.getTime() + 120_000), value: 12 },
-  //   { date: new Date(test.getTime() + 180_000), value: 7 },
-  //   { date: new Date(test.getTime() + 240_000), value: 6 },
-  //   { date: new Date(test.getTime() + 300_000), value: 3 },
-  //   { date: new Date(test.getTime() + 360_000), value: 5 },
-  //   { date: new Date(test.getTime() + 420_000), value: 8 },
-  //   { date: new Date(test.getTime() + 480_000), value: 12 },
-  //   { date: new Date(test.getTime() + 540_000), value: 14 },
-  //   { date: new Date(test.getTime() + 600_000), value: 12 },
-  //   { date: new Date(test.getTime() + 660_000), value: 13.5 },
-  //   { date: new Date(test.getTime() + 720_000), value: 18 },
-  //   { date: new Date(test.getTime() + 780_000), value: 12 },
-  //   { date: new Date(test.getTime() + 840_000), value: 14 },
-  //   { date: new Date(test.getTime() + 900_000), value: 12 },
-  //   { date: new Date(test.getTime() + 960_000), value: 13.5 },
-  //   { date: new Date(test.getTime() + 1020_000), value: 69 },
-  //   { date: new Date(test.getTime() + 1080_000), value: 18 },
-  // ];
-
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const dimensionRatio = windowWidth / windowHeight;
-  console.log(dimensionRatio);
-  // const screenDimensions = Dimensions.get('screen');
 
   const styles = StyleSheet.create({
     titleContainer: {
@@ -144,7 +74,6 @@ export default function DashboardScreen() {
       width: (dimensionRatio > 1.25) ? "50%" : "100%",
       padding: 20,
       flexGrow: 1,
-      // maxWidth: 550,
     },
     ctaButton: {
       backgroundColor: "#FF6060",
@@ -177,9 +106,6 @@ export default function DashboardScreen() {
           <ThemedText type="title">Dashboard</ThemedText>
           {/* <HelloWave /> */}
         </ThemedView>
-        <TouchableOpacity onPress={refreshGraph} style={styles.ctaButton}>
-          <ThemedText style={styles.ctaButtonText}>Refresh</ThemedText>
-        </TouchableOpacity>
 
         {/* {error ? <ThemedText>{JSON.stringify(error)}</ThemedText> : isLoading ? <ThemedText>Loading</ThemedText> : <ThemedText>{JSON.stringify(data)}</ThemedText>} */}
         <ThemedView style={styles.graphContainer}>

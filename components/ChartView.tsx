@@ -16,10 +16,8 @@ import { Tooltip } from "@/components/ChartViewTooltip";
 import { Colors } from "@/constants/Colors";
 import React from "react";
 
-export interface Element {
-  date: Date;
-  value: number;
-}
+import { DataElement } from "@/services/data";
+
 
 interface Domain {
   min: number;
@@ -28,7 +26,7 @@ interface Domain {
 
 export type ChartViewProps = ViewProps & {
   title: string;
-  data: Element[];
+  data: DataElement[];
   xDomain: Domain;
   yDomain: Domain;
 };

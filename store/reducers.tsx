@@ -1,13 +1,12 @@
 // reducers.js
 import { combineReducers } from "redux";
 import { createSlice } from "@reduxjs/toolkit";
-import { Element } from "@/components/ChartView";
-
+import { DataElement } from "@/services/data";
 import { serverApi } from '@/services/server';
 
 interface DataState {
   portTypes: (string | null)[];
-  readVals: Element[][];
+  readVals: DataElement[][];
 }
 
 const initialState = {

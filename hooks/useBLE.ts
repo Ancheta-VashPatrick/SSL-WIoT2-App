@@ -11,7 +11,7 @@ import {
   Characteristic,
   Device,
 } from "react-native-ble-plx";
-import { Element } from "@/components/ChartView";
+import { DataElement } from "@/services/data";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Aes from "react-native-aes-crypto";
@@ -36,7 +36,7 @@ function useBLE() {
 
   const [blePortTypes, setBlePortTypes] = useState<(string | null)[]>([null, null, null, null]);
   const [tempTypes, setTempTypes] = useState<(string | null)[]>([null, null, null, null]);
-  const [bleReadVals, setBleReadVals] = useState<Element[][]>([[], [], [], []]);
+  const [bleReadVals, setBleReadVals] = useState<DataElement[][]>([[], [], [], []]);
 
   const [clearReadInterval, setClearReadInterval] = useState(() => {return () => {return () => {}}});
 
