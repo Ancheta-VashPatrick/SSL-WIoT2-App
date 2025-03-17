@@ -4,6 +4,9 @@ import {
   Platform,
   TouchableOpacity,
   FlatList,
+  useWindowDimensions,
+  useColorScheme,
+  ScrollView,
 } from "react-native";
 
 import { Collapsible } from "@/components/Collapsible";
@@ -22,7 +25,7 @@ export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
     const { successfulUploads, uploadData } = useRequests();
 
-    const useBLE = require('../../hooks/useBLE').useBLE;
+    const useBLE = require("../../hooks/useBLE").useBLE;
 
     const {
       allDevices,
@@ -60,42 +63,129 @@ export default function CollectScreen() {
       ph: "pH",
     };
 
+    const mockupLog = [
+      {
+        date: new Date("2025-03-17 13:34"),
+        value: "Successfully uploaded 80 data points.",
+      },
+      {
+        date: new Date("2025-03-17 13:33"),
+        value: "[ERROR] Upload failed. Trying again in 60 seconds...",
+      },
+      {
+        date: new Date("2025-03-17 13:32"),
+        value: "[ERROR] Upload failed. Trying again in 30 seconds...",
+      },
+      {
+        date: new Date("2025-03-17 13:32"),
+        value: "[ERROR] Upload failed. Trying again in 10 seconds...",
+      },
+      {
+        date: new Date("2025-03-17 13:31"),
+        value: "Successfully collected 40 data points from 'sn1'.",
+      },
+      {
+        date: new Date("2025-03-17 13:31"),
+        value: "Collection manually initiated.",
+      },
+      {
+        date: new Date("2025-03-17 13:30"),
+        value: "Scanned the area, no nodes nearby.",
+      },
+      {
+        date: new Date("2025-03-17 13:29"),
+        value: "Successfully collected 40 data points from 'coe199node'.",
+      },
+      {
+        date: new Date("2025-03-17 13:29"),
+        value: "Scanned the area, found 'coe199node'.",
+      },
+    ];
+
+    const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+    const dimensionRatio = windowWidth / windowHeight;
+    const widthDivisions = Math.floor(dimensionRatio / 1.4) + 1;
+    const widthPortion = 93 / widthDivisions;
+
     const item = ({ item }) => (
       <ThemedView style={{ flexDirection: "row" }}>
-        <ThemedView style={{ width: 200, backgroundColor: "lightyellow" }}>
+        <ThemedView style={{ flex: 4 }}>
           <ThemedText
-            style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
+            style={{
+              fontSize: 16,
+              fontWeight: "bold",
+              textAlign: "center",
+              marginRight: 10,
+            }}
           >
             {/* {JSON.stringify(item.date)} */}
             {item
-              ? `${item.date
-                  .getFullYear()
-                  .toString()
-                  .padStart(4, "0")}-${item.date
-                  .getMonth()
-                  .toString()
-                  .padStart(2, "0")}-${item.date
-                  .getDate()
-                  .toString()
-                  .padStart(2, "0")} ${item.date
-                  .getHours()
-                  .toString()
-                  .padStart(2, "0")}:${item.date
-                  .getMinutes()
-                  .toString()
-                  .padStart(2, "0")}`
+              ? `${item.date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}`
               : ""}
           </ThemedText>
         </ThemedView>
-        <ThemedView style={{ width: 100, backgroundColor: "lightpink" }}>
-          <ThemedText
-            style={{ fontSize: 16, fontWeight: "bold", textAlign: "center" }}
-          >
-            {JSON.stringify(item.value)}
+        <ThemedView style={{ flex: 10 }}>
+          <ThemedText style={{ fontSize: 16, textAlign: "justify" }}>
+            {item.value}
           </ThemedText>
         </ThemedView>
       </ThemedView>
     );
+
+    const theme = useColorScheme() ?? "light";
+
+    const styles = StyleSheet.create({
+      headerImage: {
+        color: "#808080",
+        bottom: -90,
+        left: -35,
+        position: "absolute",
+      },
+      titleContainer: {
+        flexDirection: "row",
+        gap: 8,
+      },
+      ctaButtonContainer: {
+        flex: widthDivisions,
+        flexDirection: "row",
+        flexWrap: "wrap",
+      },
+      ctaButton: {
+        width: `${widthPortion}%`,
+        maxWidth: `${widthPortion}%`,
+        backgroundColor: "#FF6060",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 50,
+        marginHorizontal: 20,
+        marginBottom: 5,
+        borderRadius: 8,
+        flexGrow: 1,
+      },
+      ctaButtonText: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white",
+      },
+      ctaLogText: {
+        borderWidth: 1,
+        borderColor:
+          theme === "light" ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)",
+        borderRadius: 10,
+        padding: 15,
+      },
+      ctaText: {
+        justifyContent: "center",
+        alignItems: "center",
+      },
+    });
 
     return (
       <ParallaxScrollView
@@ -138,21 +228,30 @@ export default function CollectScreen() {
             {/* <ThemedText>{`\n${tempVals[0].date}`}</ThemedText> */}
           </>
         ) : (
-          <ThemedText>Please connect the ESP32-WIOT2</ThemedText>
+          <ThemedText>There are nodes detected nearby.</ThemedText>
         )}
 
-        <TouchableOpacity
-          onPress={connectedDevice ? disconnectDevice : openModal}
-          style={styles.ctaButton}
-        >
-          <ThemedText style={styles.ctaButtonText}>
-            {connectedDevice ? "Disconnect" : "Connect"}
-          </ThemedText>
-        </TouchableOpacity>
+        <ThemedView style={styles.ctaButtonContainer}>
+          <TouchableOpacity
+            onPress={connectedDevice ? disconnectDevice : openModal}
+            style={styles.ctaButton}
+          >
+            <ThemedText style={styles.ctaButtonText}>
+              {connectedDevice ? "Disconnect" : "Connect"}
+            </ThemedText>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
-          <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
+            <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
+
+        <FlatList
+          style={styles.ctaLogText}
+          data={mockupLog}
+          renderItem={item}
+          scrollEnabled={false}
+        />
 
         {<ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText>}
 
@@ -168,34 +267,3 @@ export default function CollectScreen() {
     return <></>;
   }
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: "#808080",
-    bottom: -90,
-    left: -35,
-    position: "absolute",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  ctaButton: {
-    backgroundColor: "#FF6060",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 50,
-    marginHorizontal: 20,
-    marginBottom: 5,
-    borderRadius: 8,
-  },
-  ctaButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
-  },
-  ctaText: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

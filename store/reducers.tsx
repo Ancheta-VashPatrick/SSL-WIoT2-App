@@ -124,6 +124,6 @@ const rootReducer = persistCombineReducers(persistConfig, {
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
-// export const { setType } = sensorSlice.actions;
+export const { updateNode } = sensorSlice.actions;
 
 export default rootReducer;

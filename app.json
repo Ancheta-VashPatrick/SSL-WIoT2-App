@@ -3,7 +3,7 @@
     "name": "SSL-WIoT2-App",
     "slug": "SSL-WIoT2-App",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
