@@ -30,8 +30,8 @@ export default function DashboardScreen() {
       skipPollingIfUnfocused: true,
     });
 
-    console.log(JSON.stringify({ data, error, isLoading }));
-    console.log(item);
+    // console.log(JSON.stringify({ data, error, isLoading }));
+    // console.log(item);
   });
 
   const sensorData = useSelector((state) => state.sensorData);
@@ -118,9 +118,9 @@ export default function DashboardScreen() {
         </ThemedView>
 
         {sensorData.items.length ? (
-          sensorData.items.map((dataItem) => (
-            <Collapsible title={dataItem.title}>
-              <ThemedView style={styles.graphContainer}>
+          sensorData.items.map((dataItem, dataKey) => (
+            <Collapsible title={dataItem.title} key={dataKey}>
+              <ThemedView style={styles.graphContainer} key={dataKey}>
                 {dataItem.portTypes.length ? (
                   dataItem.portTypes.map((prop, key) => {
                     let recentData = dataItem.readVals[key];
@@ -148,7 +148,7 @@ export default function DashboardScreen() {
                       };
                     };
                     return (
-                      <ThemedView style={styles.graphItem}>
+                      <ThemedView style={styles.graphItem} key={key}>
                         <ChartView
                           key={key}
                           title={typeMap[prop]}
