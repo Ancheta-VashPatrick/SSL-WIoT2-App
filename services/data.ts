@@ -20,3 +20,21 @@ export function fromList(a): DataElement[] {
       value: a[index].value,
     }));
 }
+
+export function removeDuplicates(input: DataElement[], maxItems: number): DataElement[] {
+  let result: DataElement[] = [];
+  input.forEach((item) => {
+    // console.log(item, result.filter((pastItem) => pastItem.date == item.date));
+    if (
+      result.filter((pastItem) => pastItem.date == item.date)
+        .length == 0
+    ) {
+      if (result.length >= maxItems) {
+        result.shift();
+      }
+      result.push(item);
+    }
+  });
+
+  return result;
+}

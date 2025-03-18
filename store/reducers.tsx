@@ -3,7 +3,7 @@ import { persistCombineReducers } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import { createSlice } from "@reduxjs/toolkit";
-import { DataElement } from "@/services/data";
+import { DataElement, removeDuplicates } from "@/services/data";
 import { serverApi } from "@/services/server";
 
 interface DataItem {
@@ -26,10 +26,6 @@ const sensorSlice = createSlice({
   name: "sensorData",
   initialState: initialDataState,
   reducers: {
-    // Define your actions and reducers here
-    // setType(state, action) {
-    //   state.portTypes[action.payload.index] = action.payload.newType;
-    // },
     updateNode(state, action) {
       const { nodeId, data } = action.payload;
 
@@ -44,38 +40,21 @@ const sensorSlice = createSlice({
 
           data.forEach((item, index) => {
             newPortTypes.push(item.type);
-            if (item.type != (state.items[i].portTypes[index] ?? "")) {
-              newReadVals.push(item.data);
-            } else {
-              let newReadValsItem = state.items[i].readVals[index];
-              item.data.forEach((item) => {
-                if (
-                  newReadValsItem.filter(
-                    (pastItem) => pastItem.date == item.date
-                  ).length == 0
-                ) {
-                  if (newReadValsItem.length >= MAX_DATA_ITEMS) {
-                    newReadValsItem.shift();
-                  }
-                  newReadValsItem.push(item);
-                }
-              });
-              newReadVals.push(newReadValsItem);
+            let newReadValsItem: DataElement[] = [];
+            if (item.type == (state.items[i].portTypes[index] ?? "")) {
+              newReadValsItem = state.items[i].readVals[index];
             }
+            newReadValsItem.push(...item.data);
+            newReadVals.push(
+              removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+            );
           });
-
-          // console.log(
-          //   newPortTypes,
-          //   newReadVals.map((item) => item.length)
-          // );
 
           newReadVals.forEach((item) => {
-            item.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            item.sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
           });
-          
-          // if (i == 0) {
-          //   console.log(newReadVals)
-          // }
 
           state.items[i] = {
             title: nodeId,
@@ -89,7 +68,9 @@ const sensorSlice = createSlice({
         state.items.push({
           title: nodeId,
           portTypes: data.map((item) => item.type),
-          readVals: data.map((item) => item.data.slice(-MAX_DATA_ITEMS)),
+          readVals: data.map((item) =>
+            removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
+          ),
         });
       }
     },
@@ -107,7 +88,7 @@ const sensorSlice = createSlice({
       serverApi.endpoints.getDataByNodeId.matchRejected,
       (state, action) => {
         // console.log(JSON.stringify(state));
-        console.log(JSON.stringify(action));
+        // console.log(JSON.stringify(action));
       }
     );
     builder.addMatcher(
@@ -117,6 +98,77 @@ const sensorSlice = createSlice({
         // console.log(JSON.stringify(action));
       }
     );
+  },
+});
+
+interface UploadDataItem {
+  title: string;
+  portTypes: (string | null)[];
+  readVals: DataElement[][];
+}
+
+interface UploadDataState {
+  items: UploadDataItem[];
+}
+
+const initialUploadDataState = {
+  items: [],
+} satisfies UploadDataState as UploadDataState;
+
+const MAX_UPLOAD_DATA_ITEMS = MAX_DATA_ITEMS;
+
+const uploadSlice = createSlice({
+  name: "uploadData",
+  initialState: initialUploadDataState,
+  reducers: {
+    updateUploadNode(state, action) {
+      const { nodeId, data } = action.payload;
+
+      let isPresent = false;
+
+      for (let i = 0; i < state.items.length; i++) {
+        if (state.items[i].title == nodeId) {
+          isPresent = true;
+
+          let newPortTypes: string[] = [];
+          let newReadVals: DataElement[][] = [];
+
+          data.forEach((item, index) => {
+            newPortTypes.push(item.type);
+            let newReadValsItem: DataElement[] = [];
+            if (item.type == (state.items[i].portTypes[index] ?? "")) {
+              newReadValsItem = state.items[i].readVals[index];
+            }
+            newReadValsItem.push(...item.data);
+            newReadVals.push(
+              removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+            );
+          });
+
+          newReadVals.forEach((item) => {
+            item.sort(
+              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+          });
+
+          state.items[i] = {
+            title: nodeId,
+            portTypes: newPortTypes,
+            readVals: newReadVals,
+          };
+        }
+      }
+
+      if (!isPresent) {
+        state.items.push({
+          title: nodeId,
+          portTypes: data.map((item) => item.type),
+          readVals: data.map((item) =>
+            removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
+          ),
+        });
+      }
+    },
   },
 });
 
@@ -160,11 +212,14 @@ const persistConfig = {
 
 const rootReducer = persistCombineReducers(persistConfig, {
   sensorData: sensorSlice.reducer,
+  uploadData: uploadSlice.reducer,
   logData: logSlice.reducer,
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
 export const { updateNode } = sensorSlice.actions;
+
+export const { updateUploadNode } = uploadSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
 

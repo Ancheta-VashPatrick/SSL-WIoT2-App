@@ -11,13 +11,12 @@ import {
   Characteristic,
   Device,
 } from "react-native-ble-plx";
-import { DataElement } from "@/services/data";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Aes from "react-native-aes-crypto";
 
-import { updateNode } from "@/store/reducers";
+import { addLog, updateNode, updateUploadNode } from "@/store/reducers";
 import { useDispatch } from "react-redux";
+import store from "@/store/store";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
@@ -141,22 +140,47 @@ function useBLE() {
     // console.log(connectedDevice);
   };
 
+  let newTimeout = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      reject("Port reading timed out.");
+    }, 20_000);
+  });
+
+  const getSuccess = () => {
+    return store.store
+      .getState()
+      .uploadData.items.reduce(
+        (sum, op) =>
+          sum +
+          op.readVals.reduce((miniSum, miniOp) => miniSum + miniOp.length, 0),
+        0
+      );
+  };
   const startReadingPorts = async (device: Device | null) => {
-    Promise.all(
-      CHARACTERISTIC_UUIDS.map(
-        async (item, index) => await readPort(device, index)
-      )
-    ).then(
+    let oldSuccess = getSuccess();
+    Promise.race([
+      Promise.all(
+        CHARACTERISTIC_UUIDS.map(
+          async (item, index) => await readPort(device, index)
+        )
+      ),
+      newTimeout,
+    ]).then(
       (value) => {
         dispatch(updateNode({ nodeId: "coe199node", data: value }));
+        dispatch(updateUploadNode({ nodeId: "coe199node", data: value }));
+        let newSuccess = getSuccess();
+        dispatch(
+          addLog({
+            message: `Successfully collected ${
+              newSuccess - oldSuccess
+            } values from ${device?.name}.`,
+          })
+        );
+      },
+      (error) => {
+        console.log(error);
       }
-      //   {
-      //   let result = { nodeId: "coe199node", data: value };
-
-      //   console.log(JSON.stringify(result));
-
-      //   dispatch(updateNode(result));
-      // }
     );
   };
 
@@ -187,7 +211,12 @@ function useBLE() {
           "aes-128-cbc"
         );
       } catch (error) {
-        console.log(error);
+        console.log(error, numCalls);
+        if (numCalls < 3) {
+          return readPort(device, portNumber, numCalls + 1);
+        } else {
+          throw Error("Too many calls, aborting port read.");
+        }
       }
       if (rawVal) {
         try {
@@ -248,7 +277,7 @@ function useBLE() {
           if (numCalls < 3) {
             return readPort(device, portNumber, numCalls + 1);
           } else {
-            console.log("Too many calls, aborting port read.");
+            throw Error("Too many calls, aborting port read.");
           }
         }
       }

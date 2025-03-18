@@ -115,8 +115,9 @@ export default function CollectScreen() {
 
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const dimensionRatio = windowWidth / windowHeight;
-    const widthDivisions = Math.floor(dimensionRatio / 1.4) + 1;
-    const widthPortion = 93 / widthDivisions;
+    const widthDivisions =
+      Math.floor(dimensionRatio / (logData.items.length ? 3 : 1.4)) + (logData.items.length ? 3 : 1);
+    const widthPortion = (logData.items.length ? 83 : 93) / widthDivisions;
 
     const item = ({ item }) => (
       <ThemedView style={{ flexDirection: "row" }}>
@@ -222,14 +223,20 @@ export default function CollectScreen() {
             onPress={connectedDevice ? disconnectDevice : openModal}
             style={styles.ctaButton}
           >
-            <ThemedText style={styles.ctaButtonText}>
-              Collect
-            </ThemedText>
+            <ThemedText style={styles.ctaButtonText}>Collect</ThemedText>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={disconnectDevice} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
           </TouchableOpacity>
+
+          {logData.items.length ? (
+            <TouchableOpacity onPress={clearTheLog} style={styles.ctaButton}>
+              <ThemedText style={styles.ctaButtonText}>Clear Log</ThemedText>
+            </TouchableOpacity>
+          ) : (
+            <></>
+          )}
         </ThemedView>
 
         {logData.items.length ? (
