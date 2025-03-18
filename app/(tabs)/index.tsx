@@ -131,7 +131,7 @@ export default function DashboardScreen() {
                           (readVal) =>
                             new Date(lastDate).getTime() -
                               new Date(readVal.date).getTime() <=
-                            720_000
+                            1800_000
                         )
                         .slice(-Math.min(recentData.length, 20));
                     }

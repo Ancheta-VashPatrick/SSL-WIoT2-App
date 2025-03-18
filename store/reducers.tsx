@@ -69,6 +69,14 @@ const sensorSlice = createSlice({
           //   newReadVals.map((item) => item.length)
           // );
 
+          newReadVals.forEach((item) => {
+            item.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          });
+          
+          // if (i == 0) {
+          //   console.log(newReadVals)
+          // }
+
           state.items[i] = {
             title: nodeId,
             portTypes: newPortTypes,
@@ -90,8 +98,6 @@ const sensorSlice = createSlice({
     builder.addMatcher(
       serverApi.endpoints.getDataByNodeId.matchFulfilled,
       (state, action) => {
-        const { nodeId, data } = action.payload;
-
         sensorSlice.caseReducers.updateNode(state, action);
 
         // console.log(data);

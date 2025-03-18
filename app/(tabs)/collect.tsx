@@ -37,8 +37,6 @@ export default function CollectScreen() {
       disconnectDevice,
       scanForPeripherals,
       requestPermissions,
-      blePortTypes,
-      bleReadVals,
     } = useBLE();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -217,46 +215,19 @@ export default function CollectScreen() {
           <ThemedText type="title">Collect</ThemedText>
         </ThemedView>
 
-        {connectedDevice ? (
-          <>
-            {bleReadVals.map((prop, key) => (
-              <ThemedView
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                key={key}
-              >
-                <ThemedText>
-                  {blePortTypes[key] === null ? "" : typeMap[blePortTypes[key]]}
-                </ThemedText>
-                <FlatList
-                  data={prop}
-                  renderItem={item}
-                  scrollEnabled={false}
-                  extraData={bleReadVals}
-                />
-              </ThemedView>
-            ))}
-            {/* <ThemedText>{`\n${tempVals[0].date}`}</ThemedText> */}
-          </>
-        ) : (
-          <ThemedText>There are nodes detected nearby.</ThemedText>
-        )}
+        <ThemedText>There are nodes detected nearby.</ThemedText>
 
         <ThemedView style={styles.ctaButtonContainer}>
           <TouchableOpacity
-            // onPress={connectedDevice ? disconnectDevice : openModal}
-            onPress={addToLog}
+            onPress={connectedDevice ? disconnectDevice : openModal}
             style={styles.ctaButton}
           >
             <ThemedText style={styles.ctaButtonText}>
-              Collect {mockupIndex}
+              Collect
             </ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={clearTheLog} style={styles.ctaButton}>
+          <TouchableOpacity onPress={disconnectDevice} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
           </TouchableOpacity>
         </ThemedView>

@@ -16,6 +16,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Aes from "react-native-aes-crypto";
 
+import { updateNode } from "@/store/reducers";
+import { useDispatch } from "react-redux";
+
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
 const LED_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1220";
@@ -32,13 +35,8 @@ const bleManager = new BleManager();
 function useBLE() {
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [color, setColor] = useState("white");
 
-  const [blePortTypes, setBlePortTypes] = useState<(string | null)[]>([null, null, null, null]);
-  const [tempTypes, setTempTypes] = useState<(string | null)[]>([null, null, null, null]);
-  const [bleReadVals, setBleReadVals] = useState<DataElement[][]>([[], [], [], []]);
-
-  const [clearReadInterval, setClearReadInterval] = useState(() => {return () => {return () => {}}});
+  const dispatch = useDispatch();
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -109,7 +107,8 @@ function useBLE() {
 
       if (
         device &&
-        (device.localName === "ESP32-WIOT2" || device.name === "ESP32-WIOT2")
+        (device.localName === "ESP32-WIOT2-SN2" ||
+          device.name === "ESP32-WIOT2-SN2")
       ) {
         setAllDevices((prevState: Device[]) => {
           if (!isDuplicateDevice(prevState, device)) {
@@ -137,89 +136,36 @@ function useBLE() {
 
   const disconnectDevice = async () => {
     // console.log(connectedDevice);
-    clearReadInterval();
     await connectedDevice?.cancelConnection();
     setConnectedDevice(null);
     // console.log(connectedDevice);
-  }
+  };
 
-  const onDataUpdate = (
-    error: BleError | null,
-    characteristic: Characteristic | null
+  const startReadingPorts = async (device: Device | null) => {
+    Promise.all(
+      CHARACTERISTIC_UUIDS.map(
+        async (item, index) => await readPort(device, index)
+      )
+    ).then(
+      (value) => {
+        dispatch(updateNode({ nodeId: "coe199node", data: value }));
+      }
+      //   {
+      //   let result = { nodeId: "coe199node", data: value };
+
+      //   console.log(JSON.stringify(result));
+
+      //   dispatch(updateNode(result));
+      // }
+    );
+  };
+
+  const readPort = async (
+    device: Device | null,
+    portNumber: number,
+    numCalls: number = 0
   ) => {
-    if (error) {
-      console.log(error);
-      return;
-    } else if (!characteristic?.value) {
-      console.log("No Data was received");
-      return;
-    }
-
-    const colorCode = base64.decode(characteristic.value);
-
-    let color = "white";
-    if (colorCode === "B") {
-      color = "blue";
-    } else if (colorCode === "R") {
-      color = "red";
-    } else if (colorCode === "G") {
-      color = "green";
-    }
-
-    setColor(color);
-  };
-
-  const startStreamingData = async (device: Device) => {
-    if (device) {
-      device.monitorCharacteristicForService(
-        DATA_SERVICE_UUID,
-        COLOR_CHARACTERISTIC_UUID,
-        onDataUpdate
-      );
-    } else {
-      console.log("No Device Connected");
-    }
-  };
-
-  const toggleLED = async (device: Device) => {
-    if (device) {
-      const characteristic = await device.readCharacteristicForService(
-        DATA_SERVICE_UUID,
-        LED_CHARACTERISTIC_UUID
-      );
-
-      if (!characteristic?.value) {
-        console.log("No Data was received");
-        return;
-      }
-
-      const read_val = base64.decode(characteristic.value);
-      console.log(read_val);
-      device.writeCharacteristicWithResponseForService(
-        DATA_SERVICE_UUID,
-        LED_CHARACTERISTIC_UUID,
-        base64.encode(read_val === "OFF" ? "ON" : "OFF")
-      );
-    } else {
-      console.log("No Device Connected");
-    }
-  };
-
-  const startReadingPorts = (device: Device | null) => {
-    const interval = setInterval(async () => {
-      for (let i = 0; i < 4; i++) {
-        await readPort(device, i);
-        // console.log(i);
-      }
-      setTempTypes(blePortTypes);
-    }, 7000);
-
-    setClearReadInterval(() => {return () => clearInterval(interval)});
-
-    // return () => clearInterval(interval);
-  };
-
-  const readPort = async (device: Device | null, portNumber: number) => {
+    // console.log(numCalls)
     if (device) {
       const characteristic = await device.readCharacteristicForService(
         DATA_SERVICE_UUID,
@@ -251,14 +197,14 @@ function useBLE() {
           const portType =
             rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
           // console.log(portType);
-  
+
           const TZ_OFFSET = 8;
-  
+
           let readValsBuffer = new Array();
-  
+
           let start = 8;
-          let end = (portType == "flow") ? 21 : 19;
-  
+          let end = portType == "flow" ? 21 : 19;
+
           let currDate = new Date(
             `${readVal.substring(0, 4)}-${readVal.substring(
               4,
@@ -269,14 +215,17 @@ function useBLE() {
             if (readVal.charAt(start - 1) === "|") {
               currDate = new Date(currDate.getTime() + 86400000);
             }
-  
+            if (isNaN(parseFloat(readVal.substring(start, end)))) {
+              throw Error("Bad BLE read value");
+            }
+
             readValsBuffer.push({
               date: new Date(
                 currDate.getTime() +
                   parseInt(readVal.substring(start, start + 2)) * 3600000 +
                   parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
                   TZ_OFFSET * 3600000
-              ),
+              ).toISOString(),
               value: parseFloat(
                 readVal.substring(start + (portType == "flow" ? 7 : 4), end)
               ),
@@ -291,29 +240,16 @@ function useBLE() {
               end += 12;
             }
           }
-          
-          let oldTypes = blePortTypes;
-          oldTypes[portNumber] = portType;
-          setBlePortTypes(oldTypes);
-          let oldVals = bleReadVals;
-          oldVals[portNumber] = readValsBuffer;
-          setBleReadVals(oldVals);
+
           // console.log(rawVal);
+          return { type: portType, data: readValsBuffer };
         } catch (error) {
-          console.log(error)
-        }
-        
-        try {
-          await AsyncStorage.setItem(
-            "port-types",
-            JSON.stringify(blePortTypes)
-          );
-          await AsyncStorage.setItem(
-            "read-vals",
-            JSON.stringify(bleReadVals)
-          );
-        } catch (e) {
-          // saving error
+          console.log(error);
+          if (numCalls < 3) {
+            return readPort(device, portNumber, numCalls + 1);
+          } else {
+            console.log("Too many calls, aborting port read.");
+          }
         }
       }
     } else {
@@ -327,11 +263,7 @@ function useBLE() {
     allDevices,
     scanForPeripherals,
     connectedDevice,
-    color,
     requestPermissions,
-    toggleLED,
-    blePortTypes,
-    bleReadVals,
   };
 }
 
