@@ -16,7 +16,7 @@ function useRequests() {
     });
     // console.log("end");
     const newData = await response.json();
-    console.log(newData);
+    // console.log(newData);
 
     if (newData.message == "Sensor data record created successfully") {
       // console.log("WOOP");
@@ -48,7 +48,7 @@ function useRequests() {
         for (let i = 0; i < readVals.length; i++) {
           const value = fromList(readVals[i]);
           value.forEach(async (element) => {
-            console.log(element);
+            // console.log(element);
             const data = {
               nodeId: "coe199node",
               portNumber: i,

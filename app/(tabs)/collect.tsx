@@ -21,6 +21,9 @@ import DeviceModal from "@/components/DeviceConnectionModal";
 
 import useRequests from "@/hooks/useRequests";
 
+import { addLog, clearLog } from "@/store/reducers";
+import { useDispatch, useSelector } from "react-redux";
+
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
     const { successfulUploads, uploadData } = useRequests();
@@ -63,42 +66,52 @@ export default function CollectScreen() {
       ph: "pH",
     };
 
+    const dispatch = useDispatch();
+
+    const [mockupIndex, setMockupIndex] = useState(0);
+    const logData = useSelector((state) => state.logData);
+    const addToLog = () => {
+      if (mockupIndex < mockupLog.length) {
+        setMockupIndex(mockupIndex + 1);
+        dispatch(addLog(mockupLog[mockupIndex]));
+        // console.log(mockupLog[mockupIndex]);
+        // console.log(logData)
+      }
+    };
+
+    const clearTheLog = () => {
+      setMockupIndex(0);
+      dispatch(clearLog(null));
+    };
+
     const mockupLog = [
       {
-        date: new Date("2025-03-17 13:34"),
-        value: "Successfully uploaded 80 data points.",
+        message: "Scanned the area, found 'coe199node'.",
       },
       {
-        date: new Date("2025-03-17 13:33"),
-        value: "[ERROR] Upload failed. Trying again in 60 seconds...",
+        message: "Successfully collected 40 data points from 'coe199node'.",
       },
       {
-        date: new Date("2025-03-17 13:32"),
-        value: "[ERROR] Upload failed. Trying again in 30 seconds...",
+        message: "Scanned the area, no nodes nearby.",
       },
       {
-        date: new Date("2025-03-17 13:32"),
-        value: "[ERROR] Upload failed. Trying again in 10 seconds...",
+        message: "Collection manually initiated.",
       },
       {
-        date: new Date("2025-03-17 13:31"),
-        value: "Successfully collected 40 data points from 'sn1'.",
+        message: "Successfully collected 40 data points from 'sn1'.",
       },
       {
-        date: new Date("2025-03-17 13:31"),
-        value: "Collection manually initiated.",
+        message: "[ERROR] Upload failed. Trying again in 10 seconds...",
       },
       {
-        date: new Date("2025-03-17 13:30"),
-        value: "Scanned the area, no nodes nearby.",
+        message: "[ERROR] Upload failed. Trying again in 30 seconds...",
       },
       {
-        date: new Date("2025-03-17 13:29"),
-        value: "Successfully collected 40 data points from 'coe199node'.",
+        message: "[ERROR] Upload failed. Trying again in 60 seconds...",
       },
       {
-        date: new Date("2025-03-17 13:29"),
-        value: "Scanned the area, found 'coe199node'.",
+        date: "2025-03-17 13:34",
+        message: "Successfully uploaded 80 data points.",
       },
     ];
 
@@ -109,7 +122,7 @@ export default function CollectScreen() {
 
     const item = ({ item }) => (
       <ThemedView style={{ flexDirection: "row" }}>
-        <ThemedView style={{ flex: 4 }}>
+        <ThemedView style={{ flex: 6 }}>
           <ThemedText
             style={{
               fontSize: 16,
@@ -120,20 +133,21 @@ export default function CollectScreen() {
           >
             {/* {JSON.stringify(item.date)} */}
             {item
-              ? `${item.date.toLocaleDateString("en-US", {
+              ? `${new Date(item.date).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "2-digit",
                   day: "2-digit",
                   hour: "2-digit",
                   minute: "2-digit",
+                  second: "2-digit",
                   hour12: true,
                 })}`
               : ""}
           </ThemedText>
         </ThemedView>
-        <ThemedView style={{ flex: 10 }}>
+        <ThemedView style={{ flex: 11 }}>
           <ThemedText style={{ fontSize: 16, textAlign: "justify" }}>
-            {item.value}
+            {item.message}
           </ThemedText>
         </ThemedView>
       </ThemedView>
@@ -233,25 +247,30 @@ export default function CollectScreen() {
 
         <ThemedView style={styles.ctaButtonContainer}>
           <TouchableOpacity
-            onPress={connectedDevice ? disconnectDevice : openModal}
+            // onPress={connectedDevice ? disconnectDevice : openModal}
+            onPress={addToLog}
             style={styles.ctaButton}
           >
             <ThemedText style={styles.ctaButtonText}>
-              {connectedDevice ? "Disconnect" : "Connect"}
+              Collect {mockupIndex}
             </ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
+          <TouchableOpacity onPress={clearTheLog} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
           </TouchableOpacity>
         </ThemedView>
 
-        <FlatList
-          style={styles.ctaLogText}
-          data={mockupLog}
-          renderItem={item}
-          scrollEnabled={false}
-        />
+        {logData.items.length ? (
+          <FlatList
+            style={styles.ctaLogText}
+            data={logData.items}
+            renderItem={item}
+            scrollEnabled={false}
+          />
+        ) : (
+          <></>
+        )}
 
         {<ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText>}
 

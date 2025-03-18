@@ -16,15 +16,15 @@ interface DataState {
   items: DataItem[];
 }
 
-const initialState = {
+const initialDataState = {
   items: [],
 } satisfies DataState as DataState;
 
-const MAX_ITEMS = 60;
+const MAX_DATA_ITEMS = 60;
 
 const sensorSlice = createSlice({
   name: "sensorData",
-  initialState,
+  initialState: initialDataState,
   reducers: {
     // Define your actions and reducers here
     // setType(state, action) {
@@ -54,7 +54,7 @@ const sensorSlice = createSlice({
                     (pastItem) => pastItem.date == item.date
                   ).length == 0
                 ) {
-                  if (newReadValsItem.length >= MAX_ITEMS) {
+                  if (newReadValsItem.length >= MAX_DATA_ITEMS) {
                     newReadValsItem.shift();
                   }
                   newReadValsItem.push(item);
@@ -81,7 +81,7 @@ const sensorSlice = createSlice({
         state.items.push({
           title: nodeId,
           portTypes: data.map((item) => item.type),
-          readVals: data.map((item) => item.data.slice(-MAX_ITEMS)),
+          readVals: data.map((item) => item.data.slice(-MAX_DATA_ITEMS)),
         });
       }
     },
@@ -100,7 +100,7 @@ const sensorSlice = createSlice({
     builder.addMatcher(
       serverApi.endpoints.getDataByNodeId.matchRejected,
       (state, action) => {
-        console.log(JSON.stringify(state));
+        // console.log(JSON.stringify(state));
         console.log(JSON.stringify(action));
       }
     );
@@ -114,6 +114,39 @@ const sensorSlice = createSlice({
   },
 });
 
+interface LogItem {
+  date: string;
+  message: string;
+}
+
+interface LogState {
+  items: LogItem[];
+}
+
+const initialLogState = {
+  items: [],
+} satisfies LogState as LogState;
+
+const MAX_LOG_ITEMS = 30;
+
+const logSlice = createSlice({
+  name: "logData",
+  initialState: initialLogState,
+  reducers: {
+    addLog(state, action) {
+      const { date, message } = action.payload;
+
+      state.items.unshift({ date: date ?? new Date().toISOString(), message });
+      if (state.items.length >= MAX_LOG_ITEMS) {
+        state.items.pop();
+      }
+    },
+    clearLog(state, action) {
+      state.items = [];
+    },
+  },
+});
+
 const persistConfig = {
   key: "root",
   storage,
@@ -121,9 +154,12 @@ const persistConfig = {
 
 const rootReducer = persistCombineReducers(persistConfig, {
   sensorData: sensorSlice.reducer,
+  logData: logSlice.reducer,
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
 export const { updateNode } = sensorSlice.actions;
+
+export const { addLog, clearLog } = logSlice.actions;
 
 export default rootReducer;
