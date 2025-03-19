@@ -14,25 +14,28 @@ import {
 
 import Aes from "react-native-aes-crypto";
 
-import { addLog, updateNode, updateUploadNode } from "@/store/reducers";
+import {
+  addDevice,
+  addLog,
+  markDevice,
+  removeDevice,
+  updateNode,
+  updateUploadNode,
+} from "@/store/reducers";
 import { useDispatch } from "react-redux";
 import store from "@/store/store";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
-const COLOR_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1217";
-const LED_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1220";
 const CHARACTERISTIC_UUIDS = [
   "19b10001-e8f2-537e-4f6c-d104768a1217",
   "19b10001-e8f2-537e-4f6c-d104768a1218",
   "19b10001-e8f2-537e-4f6c-d104768a1219",
   "19b10001-e8f2-537e-4f6c-d104768a1220",
 ];
-const TEMP_CHARACTERISTIC_UUID = "19b10001-e8f2-537e-4f6c-d104768a1218";
 
 const bleManager = new BleManager();
 
 function useBLE() {
-  const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
 
   const dispatch = useDispatch();
@@ -95,8 +98,59 @@ function useBLE() {
     }
   };
 
-  const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
-    devices.findIndex((device) => nextDevice.id === device.id) > -1;
+  const collectFromDevices = () => {
+    let currentDevicesData = store.store.getState().devicesData;
+    if (currentDevicesData.items.length) {
+      currentDevicesData.items.forEach((deviceString, deviceIndex) => {
+        console.log(deviceString);
+        let deviceObject = JSON.parse(deviceString);
+        let device = new Device(
+          {
+            id: deviceObject.id,
+            name: deviceObject.name,
+            rssi: deviceObject.rssi,
+            mtu: deviceObject.mtu,
+            manufacturerData: deviceObject.manufacturerData,
+            rawScanRecord: deviceObject.rawScanRecord,
+            serviceData: deviceObject.serviceData,
+            serviceUUIDs: deviceObject.serviceUUID,
+            localName: deviceObject.localName,
+            txPowerLevel: deviceObject.txPowerLevel,
+            solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
+            isConnectable: deviceObject.isConnectable,
+            overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
+          },
+          bleManager
+        );
+        if (currentDevicesData.marks[deviceIndex]) {
+          dispatch(
+            addLog({
+              message: `${device?.name} listed, but data has been collected recently.`,
+            })
+          );
+        } else {
+          // console.log("Collecting...");
+          dispatch(
+            addLog({
+              message: `Detected ${device?.name}, attempting to collect...`,
+            })
+          );
+          connectToDevice(device);
+        }
+        dispatch(
+          markDevice({
+            deviceIndex,
+          })
+        );
+      });
+    } else {
+      dispatch(
+        addLog({
+          message: `Unable to detect nearby nodes.`,
+        })
+      );
+    }
+  };
 
   const scanForPeripherals = () => {
     bleManager.startDeviceScan(null, null, (error, device) => {
@@ -106,31 +160,54 @@ function useBLE() {
 
       if (
         device &&
-        (device.localName === "ESP32-WIOT2-SN2" ||
-          device.name === "ESP32-WIOT2-SN2")
+        (device.localName?.startsWith("ESP32-WIOT2-") ||
+          device.name?.startsWith("ESP32-WIOT2-"))
       ) {
-        setAllDevices((prevState: Device[]) => {
-          if (!isDuplicateDevice(prevState, device)) {
-            return [...prevState, device];
-          }
-          return prevState;
-        });
+        dispatch(addDevice({ device: JSON.stringify(device) }));
+        // console.log(store.store.getState().devicesData.items)
       }
     });
   };
 
   const connectToDevice = async (device: Device) => {
-    try {
-      const deviceConnection = await bleManager.connectToDevice(device.id);
-      setConnectedDevice(deviceConnection);
-      await deviceConnection.discoverAllServicesAndCharacteristics();
-      bleManager.stopDeviceScan();
-
-      // startStreamingData(deviceConnection);
-      startReadingPorts(deviceConnection);
-    } catch (e) {
-      console.log("FAILED TO CONNECT", e);
-    }
+    let newTimeout = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        reject("Bluetooth connection timed out.");
+      }, 15_000);
+    });
+    Promise.race([
+      new Promise(async (resolve, reject) => {
+        try {
+          const deviceConnection = await bleManager.connectToDevice(device.id);
+          setConnectedDevice(deviceConnection);
+          await deviceConnection.discoverAllServicesAndCharacteristics();
+          bleManager.stopDeviceScan();
+          resolve(deviceConnection);
+        } catch (e) {
+          reject("Failed to connect.");
+          console.log("FAILED TO CONNECT", e);
+        }
+      }),
+      newTimeout,
+    ]).then(
+      (deviceConnection) => {
+        // startStreamingData(deviceConnection);
+        startReadingPorts(deviceConnection);
+        dispatch(
+          addLog({
+            message: `Successfully connected to ${device?.name}.`,
+          })
+        );
+      },
+      (error) => {
+        dispatch(
+          addLog({
+            message: `Failed to connect to ${device?.name}.`,
+          })
+        );
+        dispatch(removeDevice({ device: JSON.stringify(device) }));
+      }
+    );
   };
 
   const disconnectDevice = async () => {
@@ -139,12 +216,6 @@ function useBLE() {
     setConnectedDevice(null);
     // console.log(connectedDevice);
   };
-
-  let newTimeout = new Promise(function (resolve, reject) {
-    setTimeout(function () {
-      reject("Port reading timed out.");
-    }, 15_000);
-  });
 
   const getSuccess = () => {
     return store.store
@@ -157,6 +228,11 @@ function useBLE() {
       );
   };
   const startReadingPorts = async (device: Device | null) => {
+    let newTimeout = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        reject("Port reading timed out.");
+      }, 15_000);
+    });
     let oldSuccess = getSuccess();
     Promise.race([
       Promise.all(
@@ -168,8 +244,12 @@ function useBLE() {
     ])
       .then(
         (value) => {
-          dispatch(updateNode({ nodeId: "coe199node", data: value }));
-          dispatch(updateUploadNode({ nodeId: "coe199node", data: value }));
+          // console.log(JSON.stringify(value));
+          let nodeId = (device?.localName ?? device?.name ?? "")
+            .toLowerCase()
+            .slice(12);
+          dispatch(updateNode({ nodeId, data: value }));
+          dispatch(updateUploadNode({ nodeId, data: value }));
           let newSuccess = getSuccess();
           let diffSuccess = newSuccess - oldSuccess;
           if (diffSuccess) {
@@ -180,9 +260,20 @@ function useBLE() {
                 } values from ${device?.name}.`,
               })
             );
+          } else {
+            dispatch(
+              addLog({
+                message: `No new values from ${device?.name}.`,
+              })
+            );
           }
         },
         (error) => {
+          dispatch(
+            addLog({
+              message: `Unable to collect values from ${device?.name}.`,
+            })
+          );
           console.log(error);
         }
       )
@@ -253,6 +344,7 @@ function useBLE() {
             if (readVal.charAt(start - 1) === "|") {
               currDate = new Date(currDate.getTime() + 86400000);
             }
+            console.log(parseFloat(readVal.substring(start, end)));
             if (isNaN(parseFloat(readVal.substring(start, end)))) {
               throw Error("Bad BLE read value");
             }
@@ -298,7 +390,7 @@ function useBLE() {
   return {
     connectToDevice,
     disconnectDevice,
-    allDevices,
+    collectFromDevices,
     scanForPeripherals,
     connectedDevice,
     requestPermissions,

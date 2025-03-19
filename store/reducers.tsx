@@ -205,6 +205,79 @@ const logSlice = createSlice({
   },
 });
 
+interface DevicesState {
+  items: string[];
+  marks: boolean[];
+}
+
+const initialDevicesState = {
+  items: [],
+  marks: [],
+} satisfies DevicesState as DevicesState;
+
+const MAX_DEVICE_ITEMS = 30;
+
+const devicesSlice = createSlice({
+  name: "devicesData",
+  initialState: initialDevicesState,
+  reducers: {
+    addDevice(state, action) {
+      const { device } = action.payload;
+
+      if (
+        state.items.filter(
+          (item) => JSON.parse(item).id == JSON.parse(device).id
+        ).length === 0
+      ) {
+        // console.log(device);
+        state.items.unshift(device);
+        state.marks.unshift(false);
+        if (state.items.length >= MAX_LOG_ITEMS) {
+          state.items.pop();
+          state.marks.pop();
+        }
+      } else {
+        let deviceIndex = 0;
+
+        while (
+          JSON.parse(state.items[deviceIndex]).id !== JSON.parse(device).id
+        ) {
+          deviceIndex++;
+        }
+
+        state.items.splice(deviceIndex, 1, device);
+        // console.log(state.items, state.marks);
+      }
+    },
+    removeDevice(state, action) {
+      const { device } = action.payload;
+
+      let deviceIndex = 0;
+      // console.log(deviceIndex);
+      // console.log(JSON.parse(state.items[deviceIndex]).id);
+      // console.log(JSON.parse(device).id);
+      while (
+        deviceIndex < state.items.length &&
+        JSON.parse(state.items[deviceIndex]).id !== JSON.parse(device).id
+      ) {
+        deviceIndex++;
+      }
+
+      if (deviceIndex < state.items.length) {
+        state.items.splice(deviceIndex, 1);
+        state.marks.splice(deviceIndex, 1);
+      }
+    },
+    markDevice(state, action) {
+      const { deviceIndex } = action.payload;
+
+      if (deviceIndex > -1) {
+        state.marks[deviceIndex] = !state.marks[deviceIndex];
+      }
+    },
+  },
+});
+
 const persistConfig = {
   key: "root",
   storage,
@@ -214,6 +287,7 @@ const rootReducer = persistCombineReducers(persistConfig, {
   sensorData: sensorSlice.reducer,
   uploadData: uploadSlice.reducer,
   logData: logSlice.reducer,
+  devicesData: devicesSlice.reducer,
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
@@ -222,5 +296,7 @@ export const { updateNode } = sensorSlice.actions;
 export const { updateUploadNode } = uploadSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
+
+export const { addDevice, removeDevice, markDevice } = devicesSlice.actions;
 
 export default rootReducer;

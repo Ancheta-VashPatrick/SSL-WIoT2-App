@@ -11,7 +11,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
 // import useBLE from "@/hooks/useBLE";
 
@@ -22,20 +22,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
-    const { successfulUploads, uploadData } = useRequests();
+    const { uploadData } = useRequests();
 
     const useBLE = require("../../hooks/useBLE").useBLE;
 
-    const {
-      allDevices,
-      connectedDevice,
-      connectToDevice,
-      disconnectDevice,
-      scanForPeripherals,
-      requestPermissions,
-    } = useBLE();
-
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const { scanForPeripherals, requestPermissions, collectFromDevices } =
+      useBLE();
+    const devicesData = useSelector((state) => state.devicesData);
+    useEffect(() => {
+      scanForDevices();
+    }, [null]);
 
     const scanForDevices = async () => {
       const isPermissionsEnabled = await requestPermissions();
@@ -44,18 +40,17 @@ export default function CollectScreen() {
       }
     };
 
-    const hideModal = () => {
-      setIsModalVisible(false);
-    };
-
-    const openModal = async () => {
+    const oppCollect = async () => {
       scanForDevices();
-      setIsModalVisible(true);
+      // setIsModalVisible(true);
       dispatch(
         addLog({
           message: "Collection manually initiated.",
         })
       );
+      setTimeout(() => {
+        collectFromDevices();
+      }, 1_000);
     };
 
     const typeMap: { [key: string]: any } = {
@@ -143,7 +138,7 @@ export default function CollectScreen() {
           </ThemedText>
         </ThemedView>
         <ThemedView style={{ flex: 13 }}>
-          <ThemedText style={{ fontSize: 16, textAlign: "justify" }}>
+          <ThemedText style={{ fontSize: 16, textAlign: "left" }}>
             {item.message}
           </ThemedText>
         </ThemedView>
@@ -214,17 +209,18 @@ export default function CollectScreen() {
           <ThemedText type="title">Collect</ThemedText>
         </ThemedView>
 
-        <ThemedText>There are nodes detected nearby.</ThemedText>
+        <ThemedText>
+          {devicesData.items.length
+            ? "There are nodes detected nearby."
+            : "No nodes are nearby."}
+        </ThemedText>
 
         <ThemedView style={styles.ctaButtonContainer}>
-          <TouchableOpacity
-            onPress={connectedDevice ? disconnectDevice : openModal}
-            style={styles.ctaButton}
-          >
+          <TouchableOpacity onPress={oppCollect} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Collect</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={disconnectDevice} style={styles.ctaButton}>
+          <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
           </TouchableOpacity>
 
@@ -247,15 +243,6 @@ export default function CollectScreen() {
         ) : (
           <></>
         )}
-
-        {<ThemedText style={styles.ctaText}>{successfulUploads}</ThemedText>}
-
-        <DeviceModal
-          closeModal={hideModal}
-          visible={isModalVisible}
-          connectToPeripheral={connectToDevice}
-          devices={allDevices}
-        />
       </ParallaxScrollView>
     );
   } else {
