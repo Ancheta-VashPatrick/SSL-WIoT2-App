@@ -143,7 +143,7 @@ function useBLE() {
   let newTimeout = new Promise(function (resolve, reject) {
     setTimeout(function () {
       reject("Port reading timed out.");
-    }, 20_000);
+    }, 15_000);
   });
 
   const getSuccess = () => {
@@ -165,23 +165,32 @@ function useBLE() {
         )
       ),
       newTimeout,
-    ]).then(
-      (value) => {
-        dispatch(updateNode({ nodeId: "coe199node", data: value }));
-        dispatch(updateUploadNode({ nodeId: "coe199node", data: value }));
-        let newSuccess = getSuccess();
-        dispatch(
-          addLog({
-            message: `Successfully collected ${
-              newSuccess - oldSuccess
-            } values from ${device?.name}.`,
-          })
-        );
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    ])
+      .then(
+        (value) => {
+          dispatch(updateNode({ nodeId: "coe199node", data: value }));
+          dispatch(updateUploadNode({ nodeId: "coe199node", data: value }));
+          let newSuccess = getSuccess();
+          let diffSuccess = newSuccess - oldSuccess;
+          if (diffSuccess) {
+            dispatch(
+              addLog({
+                message: `Successfully collected ${
+                  newSuccess - oldSuccess
+                } values from ${device?.name}.`,
+              })
+            );
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      )
+      .finally(() =>
+        setTimeout(async function () {
+          await disconnectDevice();
+        }, 1_000)
+      );
   };
 
   const readPort = async (

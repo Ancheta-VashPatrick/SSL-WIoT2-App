@@ -4,18 +4,14 @@ import {
   Platform,
   TouchableOpacity,
   FlatList,
-  useWindowDimensions,
   useColorScheme,
-  ScrollView,
 } from "react-native";
 
-import { Collapsible } from "@/components/Collapsible";
-import { ExternalLink } from "@/components/ExternalLink";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DeviceModal from "@/components/DeviceConnectionModal";
 // import useBLE from "@/hooks/useBLE";
 
@@ -55,6 +51,11 @@ export default function CollectScreen() {
     const openModal = async () => {
       scanForDevices();
       setIsModalVisible(true);
+      dispatch(
+        addLog({
+          message: "Collection manually initiated.",
+        })
+      );
     };
 
     const typeMap: { [key: string]: any } = {
@@ -113,11 +114,8 @@ export default function CollectScreen() {
       },
     ];
 
-    const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-    const dimensionRatio = windowWidth / windowHeight;
-    const widthDivisions =
-      Math.floor(dimensionRatio / (logData.items.length ? 3 : 1.4)) + (logData.items.length ? 3 : 1);
-    const widthPortion = (logData.items.length ? 83 : 93) / widthDivisions;
+    const widthDivisions = logData.items.length ? 3 : 2;
+    const widthPortion = (logData.items.length ? 95 : 97) / widthDivisions;
 
     const item = ({ item }) => (
       <ThemedView style={{ flexDirection: "row" }}>
@@ -144,7 +142,7 @@ export default function CollectScreen() {
               : ""}
           </ThemedText>
         </ThemedView>
-        <ThemedView style={{ flex: 11 }}>
+        <ThemedView style={{ flex: 13 }}>
           <ThemedText style={{ fontSize: 16, textAlign: "justify" }}>
             {item.message}
           </ThemedText>
@@ -177,7 +175,7 @@ export default function CollectScreen() {
         justifyContent: "center",
         alignItems: "center",
         height: 50,
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         marginBottom: 5,
         borderRadius: 8,
         flexGrow: 1,

@@ -21,18 +21,24 @@ export function fromList(a): DataElement[] {
     }));
 }
 
-export function removeDuplicates(input: DataElement[], maxItems: number): DataElement[] {
+export function removeDuplicates(
+  input: DataElement[],
+  maxItems: number
+): DataElement[] {
   let result: DataElement[] = [];
   input.forEach((item) => {
     // console.log(item, result.filter((pastItem) => pastItem.date == item.date));
-    if (
-      result.filter((pastItem) => pastItem.date == item.date)
-        .length == 0
-    ) {
-      if (result.length >= maxItems) {
+    if (result.filter((pastItem) => pastItem.date == item.date).length == 0) {
+      let i = 0;
+      while (
+        new Date(input[i].date).getTime() < new Date(item.date).getTime()
+      ) {
+        i++;
+      }
+      result.splice(i, 1, item);
+      if (result.length > maxItems) {
         result.shift();
       }
-      result.push(item);
     }
   });
 
