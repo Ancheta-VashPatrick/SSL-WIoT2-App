@@ -101,8 +101,8 @@ function useBLE() {
   const collectFromDevices = () => {
     let currentDevicesData = store.store.getState().devicesData;
     if (currentDevicesData.items.length) {
-      currentDevicesData.items.forEach((deviceString, deviceIndex) => {
-        console.log(deviceString);
+      currentDevicesData.items.forEach((deviceString) => {
+        // console.log(deviceString);
         let deviceObject = JSON.parse(deviceString);
         let device = new Device(
           {
@@ -122,26 +122,7 @@ function useBLE() {
           },
           bleManager
         );
-        if (currentDevicesData.marks[deviceIndex]) {
-          dispatch(
-            addLog({
-              message: `${device?.name} listed, but data has been collected recently.`,
-            })
-          );
-        } else {
-          // console.log("Collecting...");
-          dispatch(
-            addLog({
-              message: `Detected ${device?.name}, attempting to collect...`,
-            })
-          );
-          connectToDevice(device);
-        }
-        dispatch(
-          markDevice({
-            deviceIndex,
-          })
-        );
+        connectToDevice(device);
       });
     } else {
       dispatch(
@@ -170,6 +151,7 @@ function useBLE() {
   };
 
   const connectToDevice = async (device: Device) => {
+    let currentDevicesData = store.store.getState().devicesData;
     let newTimeout = new Promise(function (resolve, reject) {
       setTimeout(function () {
         reject("Bluetooth connection timed out.");
@@ -192,19 +174,33 @@ function useBLE() {
     ]).then(
       (deviceConnection) => {
         // startStreamingData(deviceConnection);
-        startReadingPorts(deviceConnection);
-        dispatch(
-          addLog({
-            message: `Successfully connected to ${device?.name}.`,
-          })
-        );
+        if (currentDevicesData.marks[device?.id]) {
+          dispatch(
+            addLog({
+              message: `Detected ${device?.name}, but data has been collected recently.`,
+            })
+          );
+          dispatch(
+            markDevice({
+              device: JSON.stringify(device),
+            })
+          );
+        } else {
+          // console.log("Collecting...");
+          dispatch(
+            addLog({
+              message: `Detected ${device?.name}, attempting to collect...`,
+            })
+          );
+          startReadingPorts(deviceConnection);
+        }
       },
       (error) => {
-        dispatch(
-          addLog({
-            message: `Failed to connect to ${device?.name}.`,
-          })
-        );
+        // dispatch(
+        //   addLog({
+        //     message: `Failed to connect to ${device?.name}.`,
+        //   })
+        // );
         dispatch(removeDevice({ device: JSON.stringify(device) }));
       }
     );
@@ -258,6 +254,11 @@ function useBLE() {
                 message: `Successfully collected ${
                   newSuccess - oldSuccess
                 } values from ${device?.name}.`,
+              })
+            );
+            dispatch(
+              markDevice({
+                device: JSON.stringify(device),
               })
             );
           } else {
@@ -321,7 +322,7 @@ function useBLE() {
       if (rawVal) {
         try {
           const readVal = rawVal.slice(5, -1);
-          console.log(rawVal);
+          console.log(device?.name ?? device?.localName, rawVal);
           let rawPortType = rawVal.slice(0, 4);
           const portType =
             rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
@@ -344,7 +345,7 @@ function useBLE() {
             if (readVal.charAt(start - 1) === "|") {
               currDate = new Date(currDate.getTime() + 86400000);
             }
-            console.log(parseFloat(readVal.substring(start, end)));
+            // console.log(parseFloat(readVal.substring(start, end)));
             if (isNaN(parseFloat(readVal.substring(start, end)))) {
               throw Error("Bad BLE read value");
             }

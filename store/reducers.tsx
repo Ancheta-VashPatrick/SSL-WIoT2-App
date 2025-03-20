@@ -207,12 +207,12 @@ const logSlice = createSlice({
 
 interface DevicesState {
   items: string[];
-  marks: boolean[];
+  marks: Record<string, boolean>;
 }
 
 const initialDevicesState = {
   items: [],
-  marks: [],
+  marks: {},
 } satisfies DevicesState as DevicesState;
 
 const MAX_DEVICE_ITEMS = 30;
@@ -231,10 +231,12 @@ const devicesSlice = createSlice({
       ) {
         // console.log(device);
         state.items.unshift(device);
-        state.marks.unshift(false);
+        state.marks[JSON.parse(device).id] = false;
         if (state.items.length >= MAX_LOG_ITEMS) {
-          state.items.pop();
-          state.marks.pop();
+          let oldItem = state.items.pop();
+          if (oldItem) {
+            delete state.marks[JSON.parse(oldItem).id];
+          }
         }
       } else {
         let deviceIndex = 0;
@@ -264,15 +266,16 @@ const devicesSlice = createSlice({
       }
 
       if (deviceIndex < state.items.length) {
+        delete state.marks[JSON.parse(device).id];
         state.items.splice(deviceIndex, 1);
-        state.marks.splice(deviceIndex, 1);
       }
     },
     markDevice(state, action) {
-      const { deviceIndex } = action.payload;
+      const { device } = action.payload;
 
-      if (deviceIndex > -1) {
-        state.marks[deviceIndex] = !state.marks[deviceIndex];
+      let deviceId = JSON.parse(device).id;
+      if (deviceId in state.marks) {
+        state.marks[deviceId] = !state.marks[deviceId];
       }
     },
   },
