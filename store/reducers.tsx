@@ -31,48 +31,53 @@ const sensorSlice = createSlice({
 
       let isPresent = false;
 
-      for (let i = 0; i < state.items.length; i++) {
-        if (state.items[i].title == nodeId) {
-          isPresent = true;
+      if (data.length) {
+        for (let i = 0; i < state.items.length; i++) {
+          if (state.items[i].title == nodeId) {
+            isPresent = true;
 
-          let newPortTypes: string[] = [];
-          let newReadVals: DataElement[][] = [];
+            let newPortTypes: string[] = [];
+            let newReadVals: DataElement[][] = [];
 
-          data.forEach((item, index) => {
-            newPortTypes.push(item.type);
-            let newReadValsItem: DataElement[] = [];
-            if (item.type == (state.items[i].portTypes[index] ?? "")) {
-              newReadValsItem = state.items[i].readVals[index];
-            }
-            newReadValsItem.push(...item.data);
-            newReadVals.push(
-              removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
-            );
-          });
+            data.forEach((item, index) => {
+              newPortTypes.push(item.type);
+              let newReadValsItem: DataElement[] = [];
+              if (item.type == (state.items[i].portTypes[index] ?? "")) {
+                newReadValsItem = state.items[i].readVals[index];
+              }
+              newReadValsItem.push(...item.data);
+              newReadVals.push(
+                removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+              );
+            });
 
-          newReadVals.forEach((item) => {
-            item.sort(
-              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-            );
-          });
+            newReadVals.forEach((item) => {
+              item.sort(
+                (a, b) =>
+                  new Date(a.date).getTime() - new Date(b.date).getTime()
+              );
+            });
 
-          state.items[i] = {
+            state.items[i] = {
+              title: nodeId,
+              portTypes: newPortTypes,
+              readVals: newReadVals,
+            };
+          }
+        }
+
+        if (!isPresent) {
+          state.items.push({
             title: nodeId,
-            portTypes: newPortTypes,
-            readVals: newReadVals,
-          };
+            portTypes: data.map((item) => item.type),
+            readVals: data.map((item) =>
+              removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
+            ),
+          });
         }
       }
 
-      if (!isPresent) {
-        state.items.push({
-          title: nodeId,
-          portTypes: data.map((item) => item.type),
-          readVals: data.map((item) =>
-            removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
-          ),
-        });
-      }
+      state.items.sort((a, b) => a.title.localeCompare(b.title));
     },
   },
   extraReducers: (builder) => {
@@ -115,7 +120,7 @@ const initialUploadDataState = {
   items: [],
 } satisfies UploadDataState as UploadDataState;
 
-const MAX_UPLOAD_DATA_ITEMS = MAX_DATA_ITEMS;
+export const MAX_UPLOAD_DATA_ITEMS = MAX_DATA_ITEMS;
 
 const uploadSlice = createSlice({
   name: "uploadData",
@@ -126,47 +131,67 @@ const uploadSlice = createSlice({
 
       let isPresent = false;
 
-      for (let i = 0; i < state.items.length; i++) {
-        if (state.items[i].title == nodeId) {
-          isPresent = true;
+      if (data.length) {
+        for (let i = 0; i < state.items.length; i++) {
+          if (state.items[i].title == nodeId) {
+            isPresent = true;
 
-          let newPortTypes: string[] = [];
-          let newReadVals: DataElement[][] = [];
+            let newPortTypes: string[] = [];
+            let newReadVals: DataElement[][] = [];
 
-          data.forEach((item, index) => {
-            newPortTypes.push(item.type);
-            let newReadValsItem: DataElement[] = [];
-            if (item.type == (state.items[i].portTypes[index] ?? "")) {
-              newReadValsItem = state.items[i].readVals[index];
-            }
-            newReadValsItem.push(...item.data);
-            newReadVals.push(
-              removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
-            );
-          });
+            data.forEach((item, index) => {
+              newPortTypes.push(item.type);
+              let newReadValsItem: DataElement[] = [];
+              if (item.type == (state.items[i].portTypes[index] ?? "")) {
+                newReadValsItem = state.items[i].readVals[index];
+              }
+              newReadValsItem.push(...item.data);
+              newReadVals.push(
+                removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+              );
+            });
 
-          newReadVals.forEach((item) => {
-            item.sort(
-              (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-            );
-          });
+            newReadVals.forEach((item) => {
+              item.sort(
+                (a, b) =>
+                  new Date(a.date).getTime() - new Date(b.date).getTime()
+              );
+            });
 
-          state.items[i] = {
+            state.items[i] = {
+              title: nodeId,
+              portTypes: newPortTypes,
+              readVals: newReadVals,
+            };
+          }
+        }
+
+        if (!isPresent) {
+          state.items.push({
             title: nodeId,
-            portTypes: newPortTypes,
-            readVals: newReadVals,
-          };
+            portTypes: data.map((item) => item.type),
+            readVals: data.map((item) =>
+              removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
+            ),
+          });
         }
       }
+    },
+    removeRecord(state, action) {
+      const { nodeId, portNumber, recordedAt } = action.payload;
 
-      if (!isPresent) {
-        state.items.push({
-          title: nodeId,
-          portTypes: data.map((item) => item.type),
-          readVals: data.map((item) =>
-            removeDuplicates(item.data, MAX_UPLOAD_DATA_ITEMS)
-          ),
-        });
+      for (let i = 0; i < state.items.length; i++) {
+        if (state.items[i].title == nodeId) {
+          for (let j = 0; j < state.items[i].readVals[portNumber].length; j++) {
+            if (state.items[i].readVals[portNumber][j].date == recordedAt) {
+              state.items[i].readVals[portNumber].splice(j, 1);
+            }
+          }
+        }
+
+        if (state.items[i].readVals.every((item) => !item.length)) {
+          state.items.splice(i, 1);
+        }
       }
     },
   },
@@ -232,7 +257,7 @@ const devicesSlice = createSlice({
         // console.log(device);
         state.items.unshift(device);
         state.marks[JSON.parse(device).id] = false;
-        if (state.items.length >= MAX_LOG_ITEMS) {
+        if (state.items.length >= MAX_DEVICE_ITEMS) {
           let oldItem = state.items.pop();
           if (oldItem) {
             delete state.marks[JSON.parse(oldItem).id];
@@ -296,7 +321,7 @@ const rootReducer = persistCombineReducers(persistConfig, {
 
 export const { updateNode } = sensorSlice.actions;
 
-export const { updateUploadNode } = uploadSlice.actions;
+export const { updateUploadNode, removeRecord } = uploadSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
 

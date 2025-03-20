@@ -1,20 +1,16 @@
 /* eslint-disable no-bitwise */
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 
 import * as ExpoDevice from "expo-device";
 
 import base64 from "react-native-base64";
-import {
-  BleError,
-  BleManager,
-  Characteristic,
-  Device,
-} from "react-native-ble-plx";
+import { BleManager, Device } from "react-native-ble-plx";
 
 import Aes from "react-native-aes-crypto";
 
 import {
+  MAX_UPLOAD_DATA_ITEMS,
   addDevice,
   addLog,
   markDevice,
@@ -214,14 +210,18 @@ function useBLE() {
   };
 
   const getSuccess = () => {
-    return store.store
-      .getState()
-      .uploadData.items.reduce(
-        (sum, op) =>
-          sum +
-          op.readVals.reduce((miniSum, miniOp) => miniSum + miniOp.length, 0),
-        0
-      );
+    let result = store.store.getState().uploadData.items.reduce(
+      (previous, current) => ({
+        ...previous,
+        [current.title]: current.readVals.reduce(
+          (miniSum, miniOp) => miniSum + miniOp.length,
+          0
+        ),
+      }),
+      {} as Record<string, number>
+    );
+    // console.log(result);
+    return result;
   };
   const startReadingPorts = async (device: Device | null) => {
     let newTimeout = new Promise(function (resolve, reject) {
@@ -241,19 +241,17 @@ function useBLE() {
       .then(
         (value) => {
           // console.log(JSON.stringify(value));
-          let nodeId = (device?.localName ?? device?.name ?? "")
-            .toLowerCase()
-            .slice(12);
+          let nodeId = device?.localName ?? device?.name ?? "DEFAULT";
+          // .toLowerCase()
+          // .slice(12);
           dispatch(updateNode({ nodeId, data: value }));
           dispatch(updateUploadNode({ nodeId, data: value }));
           let newSuccess = getSuccess();
-          let diffSuccess = newSuccess - oldSuccess;
+          let diffSuccess = newSuccess[nodeId] - (oldSuccess[nodeId] ?? 0);
           if (diffSuccess) {
             dispatch(
               addLog({
-                message: `Successfully collected ${
-                  newSuccess - oldSuccess
-                } values from ${device?.name}.`,
+                message: `Successfully collected ${diffSuccess} values from ${device?.name}.`,
               })
             );
             dispatch(
@@ -262,11 +260,19 @@ function useBLE() {
               })
             );
           } else {
-            dispatch(
-              addLog({
-                message: `No new values from ${device?.name}.`,
-              })
-            );
+            if (newSuccess[nodeId] == MAX_UPLOAD_DATA_ITEMS) {
+              dispatch(
+                addLog({
+                  message: `Buffer for ${device?.name} full. Old values might have been deleted.`,
+                })
+              );
+            } else {
+              dispatch(
+                addLog({
+                  message: `No new values from ${device?.name}.`,
+                })
+              );
+            }
           }
         },
         (error) => {

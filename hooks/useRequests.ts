@@ -1,29 +1,57 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { addLog, removeRecord } from "@/store/reducers";
+import store from "@/store/store";
 
 import { fetch } from "expo/fetch";
-import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 function useRequests() {
+  const dispatch = useDispatch();
+
   const url = "http://10.158.66.62:3000/sensor-data";
-  async function createEntry(data) {
-    // console.log("start");
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    // console.log("end");
-    const newData = await response.json();
-    // console.log(newData);
+  async function createEntry(data, recordedAt) {
+    // console.log(JSON.stringify(data));
+    // console.log("start", JSON.stringify(data));
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      // console.log("end");
+      const newData = await response.json();
+      // console.log(JSON.stringify(data));
+      // console.log(newData);
+      // console.log(response.status);
+      if (
+        response.status == 201 &&
+        newData.message == "Sensor data record created successfully"
+      ) {
+        dispatch(
+          removeRecord({
+            nodeId: data.nodeId,
+            portNumber: data.portNumber,
+            recordedAt,
+          })
+        );
+      } else if (
+        response.status == 409 &&
+        newData.message.startsWith("Duplicate entry ")
+      ) {
+        dispatch(
+          removeRecord({
+            nodeId: data.nodeId,
+            portNumber: data.portNumber,
+            recordedAt,
+          })
+        );
+      }
 
-    if (newData.message == "Sensor data record created successfully") {
-      // console.log("WOOP");
-      // setSuccessfulUploads(successfulUploads + 1);
+      return { status: response.status, body: newData };
+    } catch (error) {
+      return { status: 503, body: { message: error } };
     }
-
-    return newData;
   }
 
   function fromList(a) {
@@ -35,52 +63,107 @@ function useRequests() {
       }));
   }
 
+  // https://stackoverflow.com/questions/23483718/turn-array-into-comma-separated-grammatically-correct-sentence
+  function arrayToSentence(arr: string[]) {
+    var last = arr.pop();
+    return arr.length ? arr.join(", ") + " and " + last : last;
+  }
+  const statusMap = {
+    success: "successful upload",
+    other: "failed upload",
+    duplicate: "duplicate",
+  };
+
   const uploadData = async () => {
-    try {
-      // setSuccessfulUploads(0);
+    dispatch(
+      addLog({
+        message: "Attempting to upload data...",
+      })
+    );
+    let currentUploadData = store.store.getState().uploadData;
+    currentUploadData.items.forEach((item) => {
+      const portTypes = item.portTypes;
+      const readVals = item.readVals;
 
-      const rawPortTypes = await AsyncStorage.getItem("port-types");
-      const rawReadVals = await AsyncStorage.getItem("read-vals");
+      Promise.all(
+        readVals.map(async (element, index) => {
+          return Promise.all(
+            element.map(async (readVal) => {
+              let readDate = new Date(readVal.date);
 
-      if (rawReadVals !== null && rawPortTypes !== null) {
-        const readVals = JSON.parse(rawReadVals);
-        const portTypes = JSON.parse(rawPortTypes);
-        for (let i = 0; i < readVals.length; i++) {
-          const value = fromList(readVals[i]);
-          value.forEach(async (element) => {
-            // console.log(element);
-            const data = {
-              nodeId: "coe199node",
-              portNumber: i,
-              sensorType: portTypes[i],
-              value: element.value,
-              recordedAt: `${element.date
-                .getFullYear()
-                .toString()
-                .padStart(4, "0")}-${element.date
-                .getMonth()
-                .toString()
-                .padStart(2, "0")}-${element.date
-                .getDate()
-                .toString()
-                .padStart(2, "0")} ${element.date
-                .getHours()
-                .toString()
-                .padStart(2, "0")}:${element.date
-                .getMinutes()
-                .toString()
-                .padStart(2, "0")}`,
-            };
+              return await createEntry(
+                {
+                  nodeId: item.title,
+                  portNumber: index,
+                  sensorType: portTypes[index],
+                  value: readVal.value,
+                  recordedAt: `${readDate
+                    .getFullYear()
+                    .toString()
+                    .padStart(4, "0")}-${readDate
+                    .getMonth()
+                    .toString()
+                    .padStart(2, "0")}-${readDate
+                    .getDate()
+                    .toString()
+                    .padStart(2, "0")} ${readDate
+                    .getHours()
+                    .toString()
+                    .padStart(2, "0")}:${readDate
+                    .getMinutes()
+                    .toString()
+                    .padStart(2, "0")}`,
+                },
+                readVal.date
+              );
+            })
+          );
+        })
+      ).then(
+        (value) => {
+          let reducedResponse = value
+            .map((item) => {
+              let success = item.filter(
+                (subItem) =>
+                  subItem.status == 201 &&
+                  subItem.body.message ==
+                    "Sensor data record created successfully"
+              ).length;
+              let duplicate = item.filter(
+                (subItem) =>
+                  subItem.status == 409 &&
+                  subItem.body.message.startsWith("Duplicate entry ")
+              ).length;
+              let other = item.length - (success + duplicate);
 
-            // console.log(data);
-            await createEntry(data);
-          });
+              return { success, duplicate, other };
+            })
+            .reduce((prev, current) => ({
+              success: prev.success + current.success,
+              duplicate: prev.duplicate + current.duplicate,
+              other: prev.other + current.other,
+            }));
+
+          dispatch(
+            addLog({
+              message: `Attempted to upload data from ${
+                item.title
+              }. There were ${arrayToSentence(
+                Object.entries(reducedResponse).reduce(
+                  (p, [k, v]) =>
+                    v ? [...p, `${v} ${statusMap[k]}${v - 1 ? "s" : ""}`] : p,
+                  new Array<string>()
+                )
+              )}.`,
+            })
+          );
+          console.log(JSON.stringify(val));
+        },
+        (error) => {
+          console.error(error);
         }
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
+      );
+    });
   };
 
   return { uploadData };

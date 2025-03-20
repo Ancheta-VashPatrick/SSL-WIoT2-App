@@ -10,8 +10,6 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ChartView } from "@/components/ChartView";
 
@@ -22,11 +20,11 @@ import { Collapsible } from "@/components/Collapsible";
 // import { setType } from "@/store/reducers";
 
 export default function DashboardScreen() {
-  const headings = ["coe199node", "sn1"];
+  const headings = ["coe199node", "sn1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3"];
 
   headings.forEach((item) => {
     const { data, error, isLoading } = useGetDataByNodeIdQuery(item, {
-      pollingInterval: 3000,
+      pollingInterval: 5000,
       skipPollingIfUnfocused: true,
     });
 

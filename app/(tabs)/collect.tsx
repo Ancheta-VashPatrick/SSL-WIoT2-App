@@ -12,13 +12,13 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useEffect, useState } from "react";
-import DeviceModal from "@/components/DeviceConnectionModal";
 // import useBLE from "@/hooks/useBLE";
 
 import useRequests from "@/hooks/useRequests";
 
 import { addLog, clearLog } from "@/store/reducers";
 import { useDispatch, useSelector } from "react-redux";
+import store from "@/store/store";
 
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
@@ -53,6 +53,19 @@ export default function CollectScreen() {
       }, 1_000);
     };
 
+    const uploadDataBtn = async () => {
+      let currentUploadData = store.store.getState().uploadData;
+      if (currentUploadData.items.length) {
+        uploadData();
+      } else {
+        dispatch(
+          addLog({
+            message: `No data to upload.`,
+          })
+        );
+      }
+    };
+
     const typeMap: { [key: string]: any } = {
       flow: "Flow",
       temp: "Temperature",
@@ -64,14 +77,6 @@ export default function CollectScreen() {
 
     const [mockupIndex, setMockupIndex] = useState(0);
     const logData = useSelector((state) => state.logData);
-    const addToLog = () => {
-      if (mockupIndex < mockupLog.length) {
-        setMockupIndex(mockupIndex + 1);
-        dispatch(addLog(mockupLog[mockupIndex]));
-        // console.log(mockupLog[mockupIndex]);
-        // console.log(logData)
-      }
-    };
 
     const clearTheLog = () => {
       setMockupIndex(0);
@@ -220,7 +225,7 @@ export default function CollectScreen() {
             <ThemedText style={styles.ctaButtonText}>Collect</ThemedText>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={uploadData} style={styles.ctaButton}>
+          <TouchableOpacity onPress={uploadDataBtn} style={styles.ctaButton}>
             <ThemedText style={styles.ctaButtonText}>Upload</ThemedText>
           </TouchableOpacity>
 
