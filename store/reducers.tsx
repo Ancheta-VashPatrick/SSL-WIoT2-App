@@ -16,12 +16,14 @@ interface DataState {
   items: DataItem[];
   uploadItems: DataItem[];
   downloadItems: DataItem[];
+  dataLock: boolean;
 }
 
 const initialDataState = {
   items: [],
   uploadItems: [],
   downloadItems: [],
+  dataLock: false,
 } satisfies DataState as DataState;
 
 const MAX_DATA_ITEMS = 60;
@@ -245,6 +247,12 @@ const sensorSlice = createSlice({
 
       state.downloadItems.sort((a, b) => a.title.localeCompare(b.title));
     },
+    setLock(state, action) {
+      state.dataLock = true;
+    },
+    resetLock(state, action) {
+      state.dataLock = false;
+    },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
@@ -430,8 +438,13 @@ const rootReducer = persistCombineReducers(persistConfig, {
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
-export const { updateNode, updateUploadNode, removeRecord } =
-  sensorSlice.actions;
+export const {
+  updateNode,
+  updateUploadNode,
+  removeRecord,
+  setLock,
+  resetLock,
+} = sensorSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
 

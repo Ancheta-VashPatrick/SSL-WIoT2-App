@@ -33,15 +33,23 @@ export default function CollectScreen() {
     const devicesData = store.getState().devicesData;
 
     const uploadDataBtn = async () => {
-      let currentUploadData = store.getState().sensorData.uploadItems;
-      if (currentUploadData.length) {
-        uploadData();
-      } else {
+      if (store.getState().sensorData.dataLock) {
         dispatch(
           addLog({
-            message: `No data to upload.`,
+            message: `Another data process is ongoing.`,
           })
         );
+      } else {
+        let currentUploadData = store.getState().sensorData.uploadItems;
+        if (currentUploadData.length) {
+          uploadData();
+        } else {
+          dispatch(
+            addLog({
+              message: `No data to upload.`,
+            })
+          );
+        }
       }
     };
 
@@ -202,12 +210,20 @@ export default function CollectScreen() {
         <ThemedView style={styles.ctaButtonContainer}>
           <TouchableOpacity
             onPress={() => {
-              dispatch(
-                addLog({
-                  message: "Collection manually initiated.",
-                })
-              );
-              oppCollect();
+              if (store.getState().sensorData.dataLock) {
+                dispatch(
+                  addLog({
+                    message: `Another data process is ongoing.`,
+                  })
+                );
+              } else {
+                dispatch(
+                  addLog({
+                    message: "Collection manually initiated.",
+                  })
+                );
+                oppCollect();
+              }
             }}
             style={styles.ctaButton}
           >

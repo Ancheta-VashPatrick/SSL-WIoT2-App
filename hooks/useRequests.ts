@@ -1,4 +1,10 @@
-import { addLog, removeRecord, setUser } from "@/store/reducers";
+import {
+  addLog,
+  removeRecord,
+  resetLock,
+  setLock,
+  setUser,
+} from "@/store/reducers";
 import { store } from "@/store/store";
 
 import { fetch } from "expo/fetch";
@@ -74,95 +80,103 @@ function useRequests() {
   };
 
   const uploadData = async () => {
-    let currentUploadData = store.getState().sensorData.uploadItems;
-    if (currentUploadData.length) {
-      dispatch(
-        addLog({
-          message: "Attempting to upload data...",
-        })
-      );
-      currentUploadData.forEach((item) => {
-        const portTypes = item.portTypes;
-        const readVals = item.readVals;
+    if (!store.getState().sensorData.dataLock) {
+      dispatch(setLock(null));
 
-        Promise.all(
-          readVals.map(async (element, index) => {
-            return Promise.all(
-              element.map(async (readVal) => {
-                let readDate = new Date(readVal.date);
-
-                return await createEntry(
-                  {
-                    nodeId: item.title,
-                    portNumber: index,
-                    sensorType: portTypes[index],
-                    value: readVal.value,
-                    recordedAt: `${readDate
-                      .getFullYear()
-                      .toString()
-                      .padStart(4, "0")}-${(readDate.getMonth() + 1)
-                      .toString()
-                      .padStart(2, "0")}-${readDate
-                      .getDate()
-                      .toString()
-                      .padStart(2, "0")} ${readDate
-                      .getHours()
-                      .toString()
-                      .padStart(2, "0")}:${readDate
-                      .getMinutes()
-                      .toString()
-                      .padStart(2, "0")}`,
-                  },
-                  readVal.date
-                );
-              })
-            );
+      let currentUploadData = store.getState().sensorData.uploadItems;
+      if (currentUploadData.length) {
+        dispatch(
+          addLog({
+            message: "Attempting to upload data...",
           })
-        ).then(
-          (value) => {
-            let reducedResponse = value
-              .map((item) => {
-                let success = item.filter(
-                  (subItem) =>
-                    subItem.status == 201 &&
-                    subItem.body.message ==
-                      "Sensor data record created successfully"
-                ).length;
-                let duplicate = item.filter(
-                  (subItem) =>
-                    subItem.status == 409 &&
-                    subItem.body.message.startsWith("Duplicate entry ")
-                ).length;
-                let other = item.length - (success + duplicate);
-
-                return { success, duplicate, other };
-              })
-              .reduce((prev, current) => ({
-                success: prev.success + current.success,
-                duplicate: prev.duplicate + current.duplicate,
-                other: prev.other + current.other,
-              }));
-
-            dispatch(
-              addLog({
-                message: `Attempted to upload data from ${
-                  item.title
-                }. There were ${arrayToSentence(
-                  Object.entries(reducedResponse).reduce(
-                    (p, [k, v]) =>
-                      v ? [...p, `${v} ${statusMap[k]}${v - 1 ? "s" : ""}`] : p,
-                    new Array<string>()
-                  )
-                )}.`,
-              })
-            );
-            // console.log(JSON.stringify(val));
-          },
-          (error) => {
-            console.error(error);
-          }
         );
-      });
+        currentUploadData.forEach((item) => {
+          const portTypes = item.portTypes;
+          const readVals = item.readVals;
+
+          Promise.all(
+            readVals.map(async (element, index) => {
+              return Promise.all(
+                element.map(async (readVal) => {
+                  let readDate = new Date(readVal.date);
+
+                  return await createEntry(
+                    {
+                      nodeId: item.title,
+                      portNumber: index,
+                      sensorType: portTypes[index],
+                      value: readVal.value,
+                      recordedAt: `${readDate
+                        .getFullYear()
+                        .toString()
+                        .padStart(4, "0")}-${(readDate.getMonth() + 1)
+                        .toString()
+                        .padStart(2, "0")}-${readDate
+                        .getDate()
+                        .toString()
+                        .padStart(2, "0")} ${readDate
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${readDate
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`,
+                    },
+                    readVal.date
+                  );
+                })
+              );
+            })
+          ).then(
+            (value) => {
+              let reducedResponse = value
+                .map((item) => {
+                  let success = item.filter(
+                    (subItem) =>
+                      subItem.status == 201 &&
+                      subItem.body.message ==
+                        "Sensor data record created successfully"
+                  ).length;
+                  let duplicate = item.filter(
+                    (subItem) =>
+                      subItem.status == 409 &&
+                      subItem.body.message.startsWith("Duplicate entry ")
+                  ).length;
+                  let other = item.length - (success + duplicate);
+
+                  return { success, duplicate, other };
+                })
+                .reduce((prev, current) => ({
+                  success: prev.success + current.success,
+                  duplicate: prev.duplicate + current.duplicate,
+                  other: prev.other + current.other,
+                }));
+
+              dispatch(
+                addLog({
+                  message: `Attempted to upload data from ${
+                    item.title
+                  }. There were ${arrayToSentence(
+                    Object.entries(reducedResponse).reduce(
+                      (p, [k, v]) =>
+                        v
+                          ? [...p, `${v} ${statusMap[k]}${v - 1 ? "s" : ""}`]
+                          : p,
+                      new Array<string>()
+                    )
+                  )}.`,
+                })
+              );
+              // console.log(JSON.stringify(val));
+            },
+            (error) => {
+              console.error(error);
+            }
+          );
+        });
+      }
+
+      dispatch(resetLock(null));
     }
   };
 

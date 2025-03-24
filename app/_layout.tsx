@@ -54,7 +54,7 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
   return BackgroundFetch.BackgroundFetchResult.NewData;
 });
 
-async function registerBackgroundFetchAsync() {
+export async function registerBackgroundFetchAsync() {
   return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
     minimumInterval: 45, // 45 seconds
     stopOnTerminate: false, // android only,
@@ -78,12 +78,14 @@ if (Platform.OS == "android" || Platform.OS == "ios") {
   };
 
   oppCollect = async () => {
-    scanForDevices();
-    // setIsModalVisible(true);
-
-    setTimeout(() => {
-      collectFromDevices();
-    }, 1_000);
+    if (!store.getState().sensorData.dataLock) {
+      scanForDevices();
+      // setIsModalVisible(true);
+  
+      setTimeout(() => {
+        collectFromDevices();
+      }, 1_000);
+    }
   };
 }
 export { scanForDevices, oppCollect };
@@ -118,13 +120,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-
-      if (Platform.OS == "android" || Platform.OS == "ios") {
-        scanForDevices();
-        registerBackgroundFetchAsync().then(() =>
-          console.log("Background fetch registered.")
-        );
-      }
     }
   }, [loaded]);
 

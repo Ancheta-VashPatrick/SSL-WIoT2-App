@@ -15,7 +15,9 @@ import {
   addLog,
   markDevice,
   removeDevice,
+  resetLock,
   setConnectedDevice,
+  setLock,
   updateNode,
   updateUploadNode,
 } from "@/store/reducers";
@@ -93,55 +95,67 @@ function useBLE() {
   };
 
   const collectFromDevices = () => {
-    let currentDevicesData = store.getState().devicesData;
-    if (currentDevicesData.items.length) {
-      currentDevicesData.items.forEach((deviceString) => {
-        // console.log(deviceString);
-        let deviceObject = JSON.parse(deviceString);
-        let device = new Device(
-          {
-            id: deviceObject.id,
-            name: deviceObject.name,
-            rssi: deviceObject.rssi,
-            mtu: deviceObject.mtu,
-            manufacturerData: deviceObject.manufacturerData,
-            rawScanRecord: deviceObject.rawScanRecord,
-            serviceData: deviceObject.serviceData,
-            serviceUUIDs: deviceObject.serviceUUID,
-            localName: deviceObject.localName,
-            txPowerLevel: deviceObject.txPowerLevel,
-            solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
-            isConnectable: deviceObject.isConnectable,
-            overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
-          },
-          bleManager
+    if (!store.getState().sensorData.dataLock) {
+      dispatch(setLock(null));
+
+      let currentDevicesData = store.getState().devicesData;
+      if (currentDevicesData.items.length) {
+        currentDevicesData.items.forEach((deviceString) => {
+          // console.log(deviceString);
+          let deviceObject = JSON.parse(deviceString);
+          let device = new Device(
+            {
+              id: deviceObject.id,
+              name: deviceObject.name,
+              rssi: deviceObject.rssi,
+              mtu: deviceObject.mtu,
+              manufacturerData: deviceObject.manufacturerData,
+              rawScanRecord: deviceObject.rawScanRecord,
+              serviceData: deviceObject.serviceData,
+              serviceUUIDs: deviceObject.serviceUUID,
+              localName: deviceObject.localName,
+              txPowerLevel: deviceObject.txPowerLevel,
+              solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
+              isConnectable: deviceObject.isConnectable,
+              overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
+            },
+            bleManager
+          );
+          connectToDevice(device);
+        });
+      } else {
+        dispatch(
+          addLog({
+            message: `Unable to detect nearby nodes.`,
+          })
         );
-        connectToDevice(device);
-      });
-    } else {
-      dispatch(
-        addLog({
-          message: `Unable to detect nearby nodes.`,
-        })
-      );
+      }
+
+      dispatch(resetLock(null));
     }
   };
 
   const scanForPeripherals = () => {
-    bleManager.startDeviceScan(null, null, (error, device) => {
-      if (error) {
-        console.log(error);
-      }
+    if (!store.getState().sensorData.dataLock) {
+      dispatch(setLock(null));
 
-      if (
-        device &&
-        (device.localName?.startsWith("ESP32-WIOT2-") ||
-          device.name?.startsWith("ESP32-WIOT2-"))
-      ) {
-        dispatch(addDevice({ device: JSON.stringify(device) }));
-        // console.log(store.getState().devicesData.items)
-      }
-    });
+      bleManager.startDeviceScan(null, null, (error, device) => {
+        if (error) {
+          console.log(error);
+        }
+
+        if (
+          device &&
+          (device.localName?.startsWith("ESP32-WIOT2-") ||
+            device.name?.startsWith("ESP32-WIOT2-"))
+        ) {
+          dispatch(addDevice({ device: JSON.stringify(device) }));
+          // console.log(store.getState().devicesData.items)
+        }
+      });
+
+      dispatch(resetLock(null));
+    }
   };
 
   const connectToDevice = async (device: Device) => {
