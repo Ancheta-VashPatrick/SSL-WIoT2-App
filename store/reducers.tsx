@@ -116,7 +116,9 @@ const sensorSlice = createSlice({
                 removeDuplicates(
                   newReadValsItem,
                   MAX_UPLOAD_DATA_ITEMS,
-                  nodeIndex > -1 ? state.downloadItems[nodeIndex].readVals[index] : []
+                  nodeIndex > -1
+                    ? state.downloadItems[nodeIndex].readVals[index]
+                    : []
                 )
               );
             });
@@ -141,7 +143,9 @@ const sensorSlice = createSlice({
             removeDuplicates(
               uploadItem.data,
               MAX_UPLOAD_DATA_ITEMS,
-              nodeIndex > -1 ? state.downloadItems[nodeIndex].readVals[portIndex] : []
+              nodeIndex > -1
+                ? state.downloadItems[nodeIndex].readVals[portIndex]
+                : []
             )
           );
           if (
@@ -202,7 +206,9 @@ const sensorSlice = createSlice({
             data.forEach((item, index) => {
               newPortTypes.push(item.type);
               let newReadValsItem: DataElement[] = [];
-              if (item.type == (state.downloadItems[i].portTypes[index] ?? "")) {
+              if (
+                item.type == (state.downloadItems[i].portTypes[index] ?? "")
+              ) {
                 newReadValsItem = state.downloadItems[i].readVals[index];
               }
               newReadValsItem.push(...item.data);
@@ -383,6 +389,34 @@ const devicesSlice = createSlice({
   },
 });
 
+interface UserState {
+  username: string | null;
+  role: string | null;
+  nodes: Record<string, Record<string, string>>[] | null;
+  exp: Date | null;
+}
+
+const initialUserState = {
+  username: null,
+  role: null,
+  nodes: null,
+  exp: null,
+} satisfies UserState as UserState;
+
+const userSlice = createSlice({
+  name: "userData",
+  initialState: initialUserState,
+  reducers: {
+    setUser(state, action) {
+      const { username, role, nodes, exp, ...others } = action.payload;
+      state.username = username;
+      state.role = role;
+      state.nodes = nodes;
+      state.exp = exp;
+    },
+  },
+});
+
 const persistConfig = {
   key: "root",
   storage,
@@ -392,6 +426,7 @@ const rootReducer = persistCombineReducers(persistConfig, {
   sensorData: sensorSlice.reducer,
   logData: logSlice.reducer,
   devicesData: devicesSlice.reducer,
+  userData: userSlice.reducer,
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
@@ -402,5 +437,7 @@ export const { addLog, clearLog } = logSlice.actions;
 
 export const { setConnectedDevice, addDevice, removeDevice, markDevice } =
   devicesSlice.actions;
+
+export const { setUser } = userSlice.actions;
 
 export default rootReducer;

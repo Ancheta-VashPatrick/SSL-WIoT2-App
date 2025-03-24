@@ -1,4 +1,4 @@
-import { addLog, removeRecord } from "@/store/reducers";
+import { addLog, removeRecord, setUser } from "@/store/reducers";
 import { store } from "@/store/store";
 
 import { fetch } from "expo/fetch";
@@ -6,12 +6,12 @@ import { fetch } from "expo/fetch";
 function useRequests() {
   const dispatch = store.dispatch;
 
-  const url = "http://10.158.66.62:3000/sensor-data";
+  const url = "http://10.158.66.62:3000";
   async function createEntry(data, recordedAt) {
     // console.log(JSON.stringify(data));
     // console.log("start", JSON.stringify(data));
     try {
-      const response = await fetch(url, {
+      const response = await fetch(url + "/sensor-data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,7 +166,32 @@ function useRequests() {
     }
   };
 
-  return { uploadData };
+  const loginUser = async (data) => {
+    try {
+      const response = await fetch(url + "/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      // console.log("end");
+      const newData = await response.json();
+      // console.log(JSON.stringify(data));
+      // console.log(JSON.stringify(newData));
+      // console.log(response.status);
+      if (response.status == 200 && newData.message == "User record found") {
+        dispatch(setUser({ username: data.username, ...newData }));
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  };
+
+  return { uploadData, loginUser };
 }
 
 export default useRequests;
