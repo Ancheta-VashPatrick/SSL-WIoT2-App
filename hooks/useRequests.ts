@@ -2,10 +2,9 @@ import { addLog, removeRecord } from "@/store/reducers";
 import { store } from "@/store/store";
 
 import { fetch } from "expo/fetch";
-import { useDispatch } from "react-redux";
 
 function useRequests() {
-  const dispatch = useDispatch();
+  const dispatch = store.dispatch;
 
   const url = "http://10.158.66.62:3000/sensor-data";
   async function createEntry(data, recordedAt) {

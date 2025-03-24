@@ -19,6 +19,41 @@ import { addLog } from "@/store/reducers";
 
 import { Platform } from "react-native";
 
+import * as BackgroundFetch from "expo-background-fetch";
+import * as TaskManager from "expo-task-manager";
+import useRequests from "@/hooks/useRequests";
+
+const BACKGROUND_FETCH_TASK = "background-fetch";
+
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  const now = Date.now();
+
+  console.log(
+    `Got background fetch call at date: ${new Date(now).toISOString()}`
+  );
+
+  oppCollect();
+
+  setTimeout(() => {
+    const { uploadData } = useRequests();
+    let currentUploadData = store.getState().uploadData;
+    if (currentUploadData.items.length) {
+      uploadData();
+    }
+  }, 10_000);
+
+  // Be sure to return the successful result type!
+  return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+async function registerBackgroundFetchAsync() {
+  return BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+    minimumInterval: 45, // 45 seconds
+    stopOnTerminate: false, // android only,
+    startOnBoot: true, // android only
+  });
+}
+
 let scanForDevices = () => console.log("Bluetooth Scan is not supported.");
 let oppCollect = () => console.log("Bluetooth Collection is not supported");
 if (Platform.OS == "android" || Platform.OS == "ios") {
@@ -41,17 +76,13 @@ if (Platform.OS == "android" || Platform.OS == "ios") {
     // setIsModalVisible(true);
     dispatch(
       addLog({
-        message: "Collection manually initiated.",
+        message: "Collection automatically initiated.",
       })
     );
     setTimeout(() => {
       collectFromDevices();
     }, 1_000);
   };
-
-  // useEffect(() => {
-  //   scanForDevices();
-  // }, []);
 }
 export { scanForDevices, oppCollect };
 
@@ -67,6 +98,13 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+
+      if (Platform.OS == "android" || Platform.OS == "ios") {
+        scanForDevices();
+        registerBackgroundFetchAsync().then(() =>
+          console.log("Background fetch registered.")
+        );
+      }
     }
   }, [loaded]);
 

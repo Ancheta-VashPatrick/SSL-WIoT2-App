@@ -20,11 +20,15 @@ import { addLog, clearLog } from "@/store/reducers";
 import { useDispatch, useSelector } from "react-redux";
 import { store } from "@/store/store";
 
-import { oppCollect } from "@/app/_layout";
+import { oppCollect, scanForDevices } from "@/app/_layout";
 
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
     const { uploadData } = useRequests();
+
+    useEffect(() => {
+      scanForDevices();
+    }, []);
 
     const devicesData = store.getState().devicesData;
 

@@ -13,7 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { ChartView } from "@/components/ChartView";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { useGetDataByNodeIdQuery } from "@/services/server";
 import { Collapsible } from "@/components/Collapsible";

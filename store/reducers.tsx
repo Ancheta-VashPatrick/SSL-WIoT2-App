@@ -332,6 +332,7 @@ export const { updateUploadNode, removeRecord } = uploadSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
 
-export const { setConnectedDevice, addDevice, removeDevice, markDevice } = devicesSlice.actions;
+export const { setConnectedDevice, addDevice, removeDevice, markDevice } =
+  devicesSlice.actions;
 
 export default rootReducer;
