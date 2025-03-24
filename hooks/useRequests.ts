@@ -1,5 +1,5 @@
 import { addLog, removeRecord } from "@/store/reducers";
-import store from "@/store/store";
+import { store } from "@/store/store";
 
 import { fetch } from "expo/fetch";
 import { useDispatch } from "react-redux";
@@ -80,7 +80,7 @@ function useRequests() {
         message: "Attempting to upload data...",
       })
     );
-    let currentUploadData = store.store.getState().uploadData;
+    let currentUploadData = store.getState().uploadData;
     currentUploadData.items.forEach((item) => {
       const portTypes = item.portTypes;
       const readVals = item.readVals;

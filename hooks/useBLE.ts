@@ -15,11 +15,11 @@ import {
   addLog,
   markDevice,
   removeDevice,
+  setConnectedDevice,
   updateNode,
   updateUploadNode,
 } from "@/store/reducers";
-import { useDispatch } from "react-redux";
-import store from "@/store/store";
+import { store } from "@/store/store";
 
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const CHARACTERISTIC_UUIDS = [
@@ -32,9 +32,7 @@ const CHARACTERISTIC_UUIDS = [
 const bleManager = new BleManager();
 
 function useBLE() {
-  const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-
-  const dispatch = useDispatch();
+  const dispatch = store.dispatch;
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -95,7 +93,7 @@ function useBLE() {
   };
 
   const collectFromDevices = () => {
-    let currentDevicesData = store.store.getState().devicesData;
+    let currentDevicesData = store.getState().devicesData;
     if (currentDevicesData.items.length) {
       currentDevicesData.items.forEach((deviceString) => {
         // console.log(deviceString);
@@ -141,13 +139,13 @@ function useBLE() {
           device.name?.startsWith("ESP32-WIOT2-"))
       ) {
         dispatch(addDevice({ device: JSON.stringify(device) }));
-        // console.log(store.store.getState().devicesData.items)
+        // console.log(store.getState().devicesData.items)
       }
     });
   };
 
   const connectToDevice = async (device: Device) => {
-    let currentDevicesData = store.store.getState().devicesData;
+    let currentDevicesData = store.getState().devicesData;
     let newTimeout = new Promise(function (resolve, reject) {
       setTimeout(function () {
         reject("Bluetooth connection timed out.");
@@ -157,7 +155,7 @@ function useBLE() {
       new Promise(async (resolve, reject) => {
         try {
           const deviceConnection = await bleManager.connectToDevice(device.id);
-          setConnectedDevice(deviceConnection);
+          setConnectedDevice(JSON.stringify(deviceConnection));
           await deviceConnection.discoverAllServicesAndCharacteristics();
           bleManager.stopDeviceScan();
           resolve(deviceConnection);
@@ -204,13 +202,35 @@ function useBLE() {
 
   const disconnectDevice = async () => {
     // console.log(connectedDevice);
-    await connectedDevice?.cancelConnection();
-    setConnectedDevice(null);
+    let deviceString = store.getState().devicesData.connectedDevice;
+    if (deviceString) {
+      let deviceObject = JSON.parse(deviceString);
+      let connectedDevice = new Device(
+        {
+          id: deviceObject.id,
+          name: deviceObject.name,
+          rssi: deviceObject.rssi,
+          mtu: deviceObject.mtu,
+          manufacturerData: deviceObject.manufacturerData,
+          rawScanRecord: deviceObject.rawScanRecord,
+          serviceData: deviceObject.serviceData,
+          serviceUUIDs: deviceObject.serviceUUID,
+          localName: deviceObject.localName,
+          txPowerLevel: deviceObject.txPowerLevel,
+          solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
+          isConnectable: deviceObject.isConnectable,
+          overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
+        },
+        bleManager
+      );
+      await connectedDevice?.cancelConnection();
+      setConnectedDevice(null);
+    }
     // console.log(connectedDevice);
   };
 
   const getSuccess = () => {
-    let result = store.store.getState().uploadData.items.reduce(
+    let result = store.getState().uploadData.items.reduce(
       (previous, current) => ({
         ...previous,
         [current.title]: current.readVals.reduce(
@@ -399,7 +419,6 @@ function useBLE() {
     disconnectDevice,
     collectFromDevices,
     scanForPeripherals,
-    connectedDevice,
     requestPermissions,
   };
 }

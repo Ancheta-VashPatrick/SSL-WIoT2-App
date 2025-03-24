@@ -18,43 +18,18 @@ import useRequests from "@/hooks/useRequests";
 
 import { addLog, clearLog } from "@/store/reducers";
 import { useDispatch, useSelector } from "react-redux";
-import store from "@/store/store";
+import { store } from "@/store/store";
+
+import { oppCollect } from "@/app/_layout";
 
 export default function CollectScreen() {
   if (Platform.OS == "android" || Platform.OS == "ios") {
     const { uploadData } = useRequests();
 
-    const useBLE = require("../../hooks/useBLE").useBLE;
-
-    const { scanForPeripherals, requestPermissions, collectFromDevices } =
-      useBLE();
-    const devicesData = useSelector((state) => state.devicesData);
-    useEffect(() => {
-      scanForDevices();
-    }, [null]);
-
-    const scanForDevices = async () => {
-      const isPermissionsEnabled = await requestPermissions();
-      if (isPermissionsEnabled) {
-        scanForPeripherals();
-      }
-    };
-
-    const oppCollect = async () => {
-      scanForDevices();
-      // setIsModalVisible(true);
-      dispatch(
-        addLog({
-          message: "Collection manually initiated.",
-        })
-      );
-      setTimeout(() => {
-        collectFromDevices();
-      }, 1_000);
-    };
+    const devicesData = store.getState().devicesData;
 
     const uploadDataBtn = async () => {
-      let currentUploadData = store.store.getState().uploadData;
+      let currentUploadData = store.getState().uploadData;
       if (currentUploadData.items.length) {
         uploadData();
       } else {

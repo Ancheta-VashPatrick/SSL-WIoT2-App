@@ -231,11 +231,13 @@ const logSlice = createSlice({
 });
 
 interface DevicesState {
+  connectedDevice: string | null;
   items: string[];
   marks: Record<string, boolean>;
 }
 
 const initialDevicesState = {
+  connectedDevice: null,
   items: [],
   marks: {},
 } satisfies DevicesState as DevicesState;
@@ -246,6 +248,11 @@ const devicesSlice = createSlice({
   name: "devicesData",
   initialState: initialDevicesState,
   reducers: {
+    setConnectedDevice(state, action) {
+      const { device } = action.payload;
+
+      state.connectedDevice = device;
+    },
     addDevice(state, action) {
       const { device } = action.payload;
 
@@ -325,6 +332,6 @@ export const { updateUploadNode, removeRecord } = uploadSlice.actions;
 
 export const { addLog, clearLog } = logSlice.actions;
 
-export const { addDevice, removeDevice, markDevice } = devicesSlice.actions;
+export const { setConnectedDevice, addDevice, removeDevice, markDevice } = devicesSlice.actions;
 
 export default rootReducer;
