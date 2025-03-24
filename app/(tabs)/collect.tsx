@@ -33,8 +33,8 @@ export default function CollectScreen() {
     const devicesData = store.getState().devicesData;
 
     const uploadDataBtn = async () => {
-      let currentUploadData = store.getState().uploadData;
-      if (currentUploadData.items.length) {
+      let currentUploadData = store.getState().sensorData.uploadItems;
+      if (currentUploadData.length) {
         uploadData();
       } else {
         dispatch(
@@ -200,7 +200,17 @@ export default function CollectScreen() {
         </ThemedText>
 
         <ThemedView style={styles.ctaButtonContainer}>
-          <TouchableOpacity onPress={oppCollect} style={styles.ctaButton}>
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                addLog({
+                  message: "Collection manually initiated.",
+                })
+              );
+              oppCollect();
+            }}
+            style={styles.ctaButton}
+          >
             <ThemedText style={styles.ctaButtonText}>Collect</ThemedText>
           </TouchableOpacity>
 

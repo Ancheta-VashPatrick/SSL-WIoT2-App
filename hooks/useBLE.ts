@@ -230,7 +230,7 @@ function useBLE() {
   };
 
   const getSuccess = () => {
-    let result = store.getState().uploadData.items.reduce(
+    let result = store.getState().sensorData.uploadItems.reduce(
       (previous, current) => ({
         ...previous,
         [current.title]: current.readVals.reduce(
@@ -264,8 +264,8 @@ function useBLE() {
           let nodeId = device?.localName ?? device?.name ?? "DEFAULT";
           // .toLowerCase()
           // .slice(12);
-          dispatch(updateNode({ nodeId, data: value }));
           dispatch(updateUploadNode({ nodeId, data: value }));
+          dispatch(updateNode({ nodeId, data: value }));
           let newSuccess = getSuccess();
           let diffSuccess = newSuccess[nodeId] - (oldSuccess[nodeId] ?? 0);
           if (diffSuccess) {

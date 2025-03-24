@@ -32,12 +32,19 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
     `Got background fetch call at date: ${new Date(now).toISOString()}`
   );
 
+  const dispatch = store.dispatch;
+  dispatch(
+    addLog({
+      message: "Collection automatically initiated.",
+    })
+  );
+
   oppCollect();
 
   setTimeout(() => {
     const { uploadData } = useRequests();
-    let currentUploadData = store.getState().uploadData;
-    if (currentUploadData.items.length) {
+    let currentUploadData = store.getState().sensorData.uploadItems;
+    if (currentUploadData.length) {
       uploadData();
     }
   }, 10_000);
@@ -59,8 +66,6 @@ let oppCollect = () => console.log("Bluetooth Collection is not supported");
 if (Platform.OS == "android" || Platform.OS == "ios") {
   const useBLE = require("@/hooks/useBLE").useBLE;
 
-  const dispatch = store.dispatch;
-
   const { scanForPeripherals, requestPermissions, collectFromDevices } =
     useBLE();
 
@@ -74,11 +79,7 @@ if (Platform.OS == "android" || Platform.OS == "ios") {
   oppCollect = async () => {
     scanForDevices();
     // setIsModalVisible(true);
-    dispatch(
-      addLog({
-        message: "Collection automatically initiated.",
-      })
-    );
+    
     setTimeout(() => {
       collectFromDevices();
     }, 1_000);
