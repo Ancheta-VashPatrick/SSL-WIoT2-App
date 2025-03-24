@@ -79,7 +79,7 @@ if (Platform.OS == "android" || Platform.OS == "ios") {
   oppCollect = async () => {
     scanForDevices();
     // setIsModalVisible(true);
-    
+
     setTimeout(() => {
       collectFromDevices();
     }, 1_000);
@@ -123,7 +123,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
-          <StatusBar style="auto" />
+          <StatusBar style="auto" translucent={false} />
         </ThemeProvider>
       </PersistGate>
     </Provider>
