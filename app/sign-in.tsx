@@ -1,4 +1,3 @@
-import { Stack } from "expo-router";
 import {
   StyleSheet,
   TextInput,
@@ -10,8 +9,11 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useState } from "react";
 import useRequests from "@/hooks/useRequests";
+import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
+  const router = useRouter();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isInvalid, setIsInvalid] = useState(false);
@@ -22,6 +24,8 @@ export default function LoginScreen() {
       if (value) {
         setUsername("");
         setPassword("");
+
+        router.push("/");
       } else {
         setIsInvalid(true);
       }

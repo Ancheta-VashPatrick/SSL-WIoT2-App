@@ -2,7 +2,7 @@
 import { persistCombineReducers } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { AnyAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { DataElement, removeDuplicates } from "@/services/data";
 import { serverApi } from "@/services/server";
 
@@ -431,10 +431,10 @@ const persistConfig = {
 };
 
 const rootReducer = persistCombineReducers(persistConfig, {
+  userData: userSlice.reducer,
   sensorData: sensorSlice.reducer,
   logData: logSlice.reducer,
   devicesData: devicesSlice.reducer,
-  userData: userSlice.reducer,
   [serverApi.reducerPath]: serverApi.reducer,
 });
 
@@ -453,7 +453,7 @@ export const { setConnectedDevice, addDevice, removeDevice, markDevice } =
 
 export const { setUser } = userSlice.actions;
 
-const reducerProxy = (state: any, action: AnyAction) => {
+const reducerProxy = (state: any, action) => {
   if(action.type === 'logout/LOGOUT') {
     return rootReducer(undefined, action);
   }

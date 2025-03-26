@@ -8,12 +8,15 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/reducers";
+import { useRouter } from "expo-router";
 
 export default function OptionsScreen() {
   const dispatch = useDispatch();
 
+  const router = useRouter();
+
   const logoutBtn = async () => {
-    dispatch(logout());
+    // dispatch(logout());
   };
 
   return (
