@@ -401,6 +401,7 @@ interface UserState {
   username: string | null;
   role: string | null;
   nodes: Record<string, string | string[]>[] | null;
+  token: string | null;
   exp: Date | null;
 }
 
@@ -408,6 +409,7 @@ const initialUserState = {
   username: null,
   role: null,
   nodes: null,
+  token: null,
   exp: null,
 } satisfies UserState as UserState;
 
@@ -416,10 +418,11 @@ const userSlice = createSlice({
   initialState: initialUserState,
   reducers: {
     setUser(state, action) {
-      const { username, role, nodes, exp, ...others } = action.payload;
+      const { username, role, nodes, token, exp, ...others } = action.payload;
       state.username = username;
       state.role = role;
       state.nodes = nodes;
+      state.token = token;
       state.exp = exp;
     },
   },

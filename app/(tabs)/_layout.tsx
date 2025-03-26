@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 
@@ -8,6 +8,7 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { registerBackgroundFetchAsync, scanForDevices } from "@/app/_layout";
+import { useSelector } from "react-redux";
 
 export default function TabLayout() {
   useEffect(() => {
@@ -17,8 +18,15 @@ export default function TabLayout() {
         console.log("Background fetch registered.")
       );
     }
-  }, [])
-  
+  }, []);
+
+  const notExpired = useSelector((state) => {
+    return new Date().getTime() < new Date(state.userData.exp).getTime();
+  });
+
+  if (!notExpired) {
+    return <Redirect href="/sign-in" />;
+  }
 
   const colorScheme = useColorScheme();
 

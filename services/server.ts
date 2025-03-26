@@ -11,6 +11,10 @@ export const serverApi = createApi({
   reducerPath: "serverApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://10.158.66.62:3000/sensor-data/",
+    prepareHeaders(headers, api) {
+      let token = api.getState().userData.token;
+      headers.append("authorization", `Bearer ${token}`);
+    },
   }),
   endpoints: (builder) => ({
     getDataByNodeId: builder.query<GetData, string>({
