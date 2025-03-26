@@ -1,4 +1,4 @@
-import { StyleSheet, Image, Platform } from "react-native";
+import { StyleSheet, Image, Platform, TouchableOpacity } from "react-native";
 
 import { Collapsible } from "@/components/Collapsible";
 import { ExternalLink } from "@/components/ExternalLink";
@@ -6,8 +6,16 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/reducers";
 
 export default function OptionsScreen() {
+  const dispatch = useDispatch();
+
+  const logoutBtn = async () => {
+    dispatch(logout());
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
@@ -23,6 +31,9 @@ export default function OptionsScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Explore</ThemedText>
       </ThemedView>
+      <TouchableOpacity onPress={logoutBtn} style={styles.ctaButton}>
+        <ThemedText style={styles.ctaButtonText}>Log Out</ThemedText>
+      </TouchableOpacity>
       <ThemedText>
         This app includes example code to help you get started.
       </ThemedText>
@@ -125,5 +136,21 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: "row",
     gap: 8,
+  },
+  ctaButton: {
+    width: "100%",
+    backgroundColor: "#FF6060",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 50,
+    marginHorizontal: 5,
+    marginBottom: 5,
+    borderRadius: 8,
+    flexGrow: 1,
+  },
+  ctaButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
   },
 });

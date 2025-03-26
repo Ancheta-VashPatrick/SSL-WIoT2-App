@@ -21,7 +21,7 @@ import { Collapsible } from "@/components/Collapsible";
 
 export default function DashboardScreen() {
   const headings = useSelector((state) =>
-    state.userData.nodes.map((node) => node.nodeId)
+    (state.userData.nodes ?? []).map((node) => node.nodeId)
   );
 
   headings.forEach((item) => {

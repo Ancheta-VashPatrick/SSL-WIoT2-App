@@ -2,7 +2,7 @@
 import { persistCombineReducers } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-import { createSlice } from "@reduxjs/toolkit";
+import { AnyAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { DataElement, removeDuplicates } from "@/services/data";
 import { serverApi } from "@/services/server";
 
@@ -453,4 +453,19 @@ export const { setConnectedDevice, addDevice, removeDevice, markDevice } =
 
 export const { setUser } = userSlice.actions;
 
-export default rootReducer;
+const reducerProxy = (state: any, action: AnyAction) => {
+  if(action.type === 'logout/LOGOUT') {
+    return rootReducer(undefined, action);
+  }
+  return rootReducer(state, action);
+}
+
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async function (_payload, thunkAPI) {
+      thunkAPI.dispatch({ type: 'logout/LOGOUT' });
+      console.log('logged out')
+  }
+);
+
+export default reducerProxy;
