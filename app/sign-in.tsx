@@ -7,11 +7,18 @@ import {
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useRequests from "@/hooks/useRequests";
 import { useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/reducers";
 
 export default function LoginScreen() {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(logout());
+  }, []);
+
   const router = useRouter();
 
   const [username, setUsername] = useState("");

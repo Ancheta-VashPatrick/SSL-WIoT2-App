@@ -454,17 +454,17 @@ export const { setConnectedDevice, addDevice, removeDevice, markDevice } =
 export const { setUser } = userSlice.actions;
 
 const reducerProxy = (state: any, action) => {
-  if(action.type === 'logout/LOGOUT') {
+  if (action.type === "logout/LOGOUT") {
     return rootReducer(undefined, action);
   }
   return rootReducer(state, action);
-}
+};
 
 export const logout = createAsyncThunk(
   "auth/logout",
   async function (_payload, thunkAPI) {
-      thunkAPI.dispatch({ type: 'logout/LOGOUT' });
-      console.log('logged out')
+    thunkAPI.dispatch({ type: "logout/LOGOUT" });
+    console.log("logged out");
   }
 );
 

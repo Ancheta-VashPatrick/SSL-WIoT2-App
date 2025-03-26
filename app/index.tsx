@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Redirect, Slot, Stack } from "expo-router";
+import { Redirect } from "expo-router";
 
 export default function MainScreen() {
   const notExpired = useSelector((state) => {
