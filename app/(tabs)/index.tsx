@@ -20,7 +20,9 @@ import { Collapsible } from "@/components/Collapsible";
 // import { setType } from "@/store/reducers";
 
 export default function DashboardScreen() {
-  const headings = ["coe199node", "sn1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3"];
+  const headings = useSelector((state) =>
+    state.userData.nodes.map((node) => node.nodeId)
+  );
 
   headings.forEach((item) => {
     const { data, error, isLoading } = useGetDataByNodeIdQuery(item, {

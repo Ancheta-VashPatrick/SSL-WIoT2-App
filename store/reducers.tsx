@@ -400,7 +400,7 @@ const devicesSlice = createSlice({
 interface UserState {
   username: string | null;
   role: string | null;
-  nodes: Record<string, Record<string, string>>[] | null;
+  nodes: Record<string, string | string[]>[] | null;
   exp: Date | null;
 }
 
