@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useColorScheme, type ViewProps } from "react-native";
+import { StyleSheet, useColorScheme, type ViewProps } from "react-native";
 
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
@@ -17,7 +16,6 @@ import { Colors } from "@/constants/Colors";
 import React from "react";
 
 import { DataElement } from "@/services/data";
-
 
 interface Domain {
   min: number;
@@ -48,10 +46,12 @@ export function ChartView({
 
   return (
     <ThemedView>
-      <ThemedText type="subtitle">{title}</ThemedText>
+      <ThemedText style={styles.ctaText} type="subtitle">
+        {title}
+      </ThemedText>
       {data && procData.length > 1 ? (
         procData.every((val) => val.y === procData[0].y) ? (
-          <ThemedText type="subtitle">
+          <ThemedText style={styles.ctaText} type="subtitle">
             Constant Value: {procData[0].y} (
             {new Date(procData.at(-1).x * 60_000).toLocaleDateString("en-US", {
               month: "short",
@@ -64,7 +64,7 @@ export function ChartView({
           </ThemedText>
         ) : (
           <Chart
-            style={{ height: 200, width: "100%"}}
+            style={{ height: 200, width: "100%" }}
             data={procData}
             padding={{ left: 40, bottom: 20, right: 20, top: 20 }}
             xDomain={{ min: xDomain.min, max: xDomain.max }}
@@ -158,8 +158,8 @@ export function ChartView({
             />
           </Chart>
         )
-      ) : (
-        <ThemedText type="subtitle">
+      ) : procData.length ? (
+        <ThemedText style={styles.ctaText} type="subtitle">
           Single Value: {procData[0].y} (
           {new Date(procData.at(-1).x * 60_000).toLocaleDateString("en-US", {
             month: "short",
@@ -170,7 +170,19 @@ export function ChartView({
           })}
           )
         </ThemedText>
+      ) : (
+        <ThemedText style={styles.ctaText} type="subtitle">
+          No Data
+        </ThemedText>
       )}
     </ThemedView>
   );
 }
+
+const styles = StyleSheet.create({
+  ctaText: {
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+  },
+});

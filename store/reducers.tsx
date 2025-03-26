@@ -467,7 +467,7 @@ export const logout = createAsyncThunk(
   "auth/logout",
   async function (_payload, thunkAPI) {
     thunkAPI.dispatch({ type: "logout/LOGOUT" });
-    console.log("logged out");
+    // console.log("logged out");
   }
 );
 
