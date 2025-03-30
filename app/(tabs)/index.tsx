@@ -10,12 +10,15 @@ import { useSelector } from "react-redux";
 import { useGetDataByNodeIdQuery } from "@/services/server";
 
 import { ConsumerView } from "@/components/ConsumerView";
+import { ConcessionaireView } from "@/components/ConcessionaireView";
 // import { setType } from "@/store/reducers";
 
 export default function DashboardScreen() {
   const headings = useSelector((state) =>
     (state.userData.nodes ?? []).map((node) => node.nodeId)
   );
+
+  const role = useSelector((state) => state.userData.role);
 
   headings.forEach((item) => {
     const { data, error, isLoading } = useGetDataByNodeIdQuery(item, {
@@ -42,7 +45,7 @@ export default function DashboardScreen() {
           <ThemedText type="title">Dashboard</ThemedText>
         </ThemedView>
 
-        <ConsumerView />
+        {role == "concessionaire" ? <ConcessionaireView /> : <ConsumerView />}
         {/* <ThemedText>
           {error ? (
             <>{JSON.stringify(error)}</>

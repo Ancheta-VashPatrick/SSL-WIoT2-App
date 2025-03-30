@@ -57,7 +57,7 @@ export function DashboardView({
               {dataItem.items.length ? (
                 dataItem.items.map((prop, key) => {
                   let recentData = prop;
-                  if (recentData.items.length) {
+                  if ((recentData.items ?? []).length) {
                     const lastDate = recentData.items.at(-1)?.date;
                     recentData.items = recentData.items
                       .filter(
@@ -85,19 +85,19 @@ export function DashboardView({
                       <ChartView
                         key={key}
                         title={recentData.title}
-                        data={recentData.items.map((readVal) => ({
+                        data={(recentData.items ?? []).map((readVal) => ({
                           date: new Date(readVal.date),
-                          value: readVal.value,
+                          value: parseFloat(readVal.value.toString()),
                         }))}
                         xDomain={minmax(
-                          recentData.items.map(
+                          (recentData.items ?? []).map(
                             (item) => new Date(item.date).getTime() / 60_000
                           ),
                           0.14,
                           0.8
                         )}
                         yDomain={minmax(
-                          recentData.items.map((item) => item.value),
+                          (recentData.items ?? []).map((item) => item.value),
                           0.3
                         )}
                       />
