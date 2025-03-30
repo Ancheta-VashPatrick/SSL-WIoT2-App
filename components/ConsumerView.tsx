@@ -1,26 +1,27 @@
-import { useSelector } from "react-redux";
-
 import { DashboardView } from "./DashboardView";
 
+import { createSelector } from "@reduxjs/toolkit";
+import { store } from "@/store/store";
+
 export function ConsumerView() {
-  const typeMap: { [key: string]: any } = {
+  const typeMap: { [key: string]: string } = {
     flow: "Flow",
     temp: "Temperature",
     turb: "Turbidity",
     ph: "pH",
   };
 
-  const sensorData = useSelector((state) =>
-    state.sensorData.items.map((item) => {
-      return {
+  const selectData = createSelector(
+    (state) => state.sensorData,
+    (sensorData) =>
+      sensorData.items.map((item) => ({
         title: item.title,
         items: item.portTypes.map((portType, portIndex) => ({
           title: typeMap[portType],
           items: item.readVals[portIndex],
         })),
-      };
-    })
+      }))
   );
 
-  return <DashboardView data={sensorData} />;
+  return <DashboardView data={selectData(store.getState())} />;
 }
