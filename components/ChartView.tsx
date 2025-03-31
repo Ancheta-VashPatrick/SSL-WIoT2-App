@@ -52,7 +52,9 @@ export function ChartView({
     y: item.value,
   }));
 
-  const textColor = Colors[useColorScheme() ?? "light"]["text"];
+  const getColor = (type: string) => Colors[useColorScheme() ?? "light"][type]
+
+  const textColor = getColor("text");
 
   return (
     <ThemedView>
@@ -142,8 +144,8 @@ export function ChartView({
             <Area
               theme={{
                 gradient: {
-                  from: { color: "#44bd32" },
-                  to: { color: "#44bd32", opacity: 0.2 },
+                  from: { color: getColor("chartFillA"), opacity: 0.9 },
+                  to: { color: getColor("chartFillB"), opacity: 0.3 },
                 },
               }}
             />
@@ -159,10 +161,10 @@ export function ChartView({
                 />
               }
               theme={{
-                stroke: { color: "#44bd32", width: 5 },
+                stroke: { color: getColor("chartStroke"), width: 5 },
                 scatter: {
-                  default: { width: 8, height: 8, rx: 4, color: "#44ad32" },
-                  selected: { color: "red" },
+                  default: { width: 8, height: 8, rx: 4, color: getColor("chartScatter") },
+                  selected: { color: getColor("chartScatterSelected") },
                 },
               }}
               hideTooltipAfter={1000}
