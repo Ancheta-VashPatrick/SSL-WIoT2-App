@@ -3,6 +3,20 @@ import { DashboardView } from "./DashboardView";
 import { createSelector } from "@reduxjs/toolkit";
 import { store } from "@/store/store";
 
+export const labelFunc = (title: string) => {
+  if (title == "pH") {
+    return (value) => `pH ${value}`;
+  }
+
+  const meMap = {
+    Flow: "L",
+    Temperature: "°C",
+    Turbidity: "NTU",
+  };
+
+  return (value) => `${value} ${meMap[title]}`;
+};
+
 export function ConsumerView() {
   const typeMap: { [key: string]: string } = {
     flow: "Flow",
@@ -23,5 +37,7 @@ export function ConsumerView() {
       }))
   );
 
-  return <DashboardView data={selectData(store.getState())} />;
+  return (
+    <DashboardView data={selectData(store.getState())} labelUnits={labelFunc} />
+  );
 }

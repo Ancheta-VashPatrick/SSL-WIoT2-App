@@ -27,6 +27,15 @@ export type ChartViewProps = ViewProps & {
   data: DataElement[];
   xDomain: Domain;
   yDomain: Domain;
+  labelUnits: (arg0: string) => string;
+};
+
+const dateStyle = {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true,
 };
 
 export function ChartView({
@@ -35,6 +44,7 @@ export function ChartView({
   data,
   xDomain,
   yDomain,
+  labelUnits = (value) => value,
   ...otherProps
 }: ChartViewProps) {
   const procData = data.map((item) => ({
@@ -51,17 +61,24 @@ export function ChartView({
       </ThemedText>
       {data && procData.length > 1 ? (
         procData.every((val) => val.y === procData[0].y) ? (
-          <ThemedText style={styles.ctaText} type="subtitle">
-            Constant Value: {procData[0].y} (
-            {new Date(procData.at(-1).x * 60_000).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            })}
-            )
-          </ThemedText>
+          <>
+            <ThemedText style={styles.ctaText} type="subtitle">
+              Constant Value: {labelUnits(procData[0].y.toString())}
+            </ThemedText>
+            <ThemedText style={styles.ctaText} type="subtitle">
+              (
+              {new Date(procData.at(0).x * 60_000).toLocaleDateString(
+                "en-US",
+                dateStyle
+              )}{" "}
+              -{" "}
+              {new Date(procData.at(-1).x * 60_000).toLocaleDateString(
+                "en-US",
+                dateStyle
+              )}
+              )
+            </ThemedText>
+          </>
         ) : (
           <Chart
             style={{ height: 200, width: "100%" }}
@@ -117,13 +134,7 @@ export function ChartView({
                   formatter: (v) => {
                     const date = new Date(v * 60_000);
                     // return `${date.getMonth().toLocaleString()} ${date.getDate()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    });
+                    return date.toLocaleDateString("en-US", dateStyle);
                   },
                 },
               }}
@@ -142,7 +153,7 @@ export function ChartView({
                   theme={{
                     formatter: (v) => {
                       // return `${date.getMonth().toLocaleString()} ${date.getDate()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
-                      return v.y.toFixed(2);
+                      return labelUnits(v.y.toFixed(2));
                     },
                   }}
                 />
@@ -159,17 +170,19 @@ export function ChartView({
           </Chart>
         )
       ) : procData.length ? (
-        <ThemedText style={styles.ctaText} type="subtitle">
-          Single Value: {procData[0].y} (
-          {new Date(procData.at(-1).x * 60_000).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          })}
-          )
-        </ThemedText>
+        <>
+          <ThemedText style={styles.ctaText} type="subtitle">
+            Single Value: {labelUnits(procData[0].y.toString())}
+          </ThemedText>
+          <ThemedText style={styles.ctaText} type="subtitle">
+            (
+            {new Date(procData.at(-1).x * 60_000).toLocaleDateString(
+              "en-US",
+              dateStyle
+            )}
+            )
+          </ThemedText>
+        </>
       ) : (
         <ThemedText style={styles.ctaText} type="subtitle">
           No Data

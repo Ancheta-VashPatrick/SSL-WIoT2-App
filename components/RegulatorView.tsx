@@ -1,4 +1,5 @@
 import { DashboardView } from "./DashboardView";
+import { labelFunc } from "./ConsumerView";
 
 import { createSelector } from "@reduxjs/toolkit";
 import { store } from "@/store/store";
@@ -89,5 +90,7 @@ export function RegulatorView() {
     }
   );
 
-  return <DashboardView data={selectData(store.getState())} />;
+  return (
+    <DashboardView data={selectData(store.getState())} labelUnits={labelFunc} />
+  );
 }

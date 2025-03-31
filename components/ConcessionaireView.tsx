@@ -35,5 +35,10 @@ export function ConcessionaireView() {
     }
   );
 
-  return <DashboardView data={selectData(store.getState())} />;
+  return (
+    <DashboardView
+      data={selectData(store.getState())}
+      labelUnits={(title) => (value) => `${value} L`}
+    />
+  );
 }

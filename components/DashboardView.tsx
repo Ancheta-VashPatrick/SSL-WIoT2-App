@@ -20,11 +20,13 @@ interface DataCategory {
 
 export type DashboardViewProps = ViewProps & {
   data: DataCategory[];
+  labelUnits: (arg0: string) => (arg1: string) => string;
 };
 
 export function DashboardView({
   style,
   data,
+  labelUnits = (title) => (value) => value,
   ...otherProps
 }: DashboardViewProps) {
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -80,6 +82,7 @@ export function DashboardView({
                       max: Math.max(...values) + portionMax,
                     };
                   };
+
                   return (
                     <ThemedView style={styles.graphItem} key={key}>
                       <ChartView
@@ -100,6 +103,7 @@ export function DashboardView({
                           (recentData.items ?? []).map((item) => item.value),
                           0.3
                         )}
+                        labelUnits={labelUnits(recentData.title)}
                       />
                     </ThemedView>
                   );
