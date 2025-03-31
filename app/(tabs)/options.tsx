@@ -6,11 +6,13 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { useRouter } from "expo-router";
 
+import { ExternalLink } from "@/components/ExternalLink";
+
 export default function OptionsScreen() {
   const router = useRouter();
 
   const logoutBtn = async () => {
-    router.push("/sign-in")
+    router.push("/sign-in");
   };
 
   return (
@@ -31,6 +33,17 @@ export default function OptionsScreen() {
       <TouchableOpacity onPress={logoutBtn} style={styles.ctaButton}>
         <ThemedText style={styles.ctaButtonText}>Log Out</ThemedText>
       </TouchableOpacity>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Credits</ThemedText>
+      </ThemedView>
+      <ThemedView>
+        <ThemedText type="subtitle">
+          Dashboard Photo by{" "}
+          <ExternalLink href="https://www.pexels.com/photo/water-ripple-371717/">
+            Pixabay from Pexels
+          </ExternalLink>
+        </ThemedText>
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
