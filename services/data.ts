@@ -39,7 +39,7 @@ export function removeDuplicates(
       ) {
         i++;
       }
-      result.splice(i, 1, item);
+      result.splice(i, 0, item);
       if (result.length > maxItems) {
         result.shift();
       }
