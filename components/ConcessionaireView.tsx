@@ -4,21 +4,13 @@ import { createSelector } from "@reduxjs/toolkit";
 import { store } from "@/store/store";
 
 export function ConcessionaireView() {
-  const typeMap: { [key: string]: string } = {
-    flow: "Flow",
-    temp: "Temperature",
-    turb: "Turbidity",
-    ph: "pH",
-  };
-
   const selectData = createSelector(
     [(state) => state.sensorData, (state) => state.userData],
     (sensorDataRaw, userData) => {
-      console.log(sensorDataRaw);
       let sensorData = sensorDataRaw.items.map((item) => ({
         title: item.title,
         items: item.portTypes.map((portType, portIndex) => ({
-          title: typeMap[portType],
+          title: portType,
           items: item.readVals[portIndex],
         })),
       }));

@@ -11,6 +11,7 @@ import { useGetDataByNodeIdQuery } from "@/services/server";
 
 import { ConsumerView } from "@/components/ConsumerView";
 import { ConcessionaireView } from "@/components/ConcessionaireView";
+import { RegulatorView } from "@/components/RegulatorView";
 // import { setType } from "@/store/reducers";
 
 export default function DashboardScreen() {
@@ -45,7 +46,13 @@ export default function DashboardScreen() {
           <ThemedText type="title">Dashboard</ThemedText>
         </ThemedView>
 
-        {role == "concessionaire" ? <ConcessionaireView /> : <ConsumerView />}
+        {role == "concessionaire" ? (
+          <ConcessionaireView />
+        ) : role == "regulator" ? (
+          <RegulatorView />
+        ) : (
+          <ConsumerView />
+        )}
         {/* <ThemedText>
           {error ? (
             <>{JSON.stringify(error)}</>
