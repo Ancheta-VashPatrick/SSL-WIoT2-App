@@ -52,14 +52,22 @@ export function ChartView({
     y: item.value,
   }));
 
-  const getColor = (type: string) => Colors[useColorScheme() ?? "light"][type]
+  const getColor = (type: string) => Colors[useColorScheme() ?? "light"][type];
 
   const textColor = getColor("text");
+
+  const titleUnits = labelUnits("").trim();
 
   return (
     <ThemedView>
       <ThemedText style={styles.ctaText} type="subtitle">
         {title}
+        {data &&
+        titleUnits != "pH" &&
+        procData.length > 1 &&
+        !procData.every((val) => val.y === procData[0].y)
+          ? ` (${titleUnits})`
+          : ""}
       </ThemedText>
       {data && procData.length > 1 ? (
         procData.every((val) => val.y === procData[0].y) ? (
@@ -163,7 +171,12 @@ export function ChartView({
               theme={{
                 stroke: { color: getColor("chartStroke"), width: 5 },
                 scatter: {
-                  default: { width: 8, height: 8, rx: 4, color: getColor("chartScatter") },
+                  default: {
+                    width: 8,
+                    height: 8,
+                    rx: 4,
+                    color: getColor("chartScatter"),
+                  },
                   selected: { color: getColor("chartScatterSelected") },
                 },
               }}
