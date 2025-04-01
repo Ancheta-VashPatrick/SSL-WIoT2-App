@@ -1,17 +1,10 @@
 import { DashboardView } from "./DashboardView";
-import { labelFunc } from "./ConsumerView";
+import { labelFunc, typeMap } from "./ConsumerView";
 
 import { createSelector } from "@reduxjs/toolkit";
 import { store } from "@/store/store";
 
 export function RegulatorView() {
-  const typeMap: { [key: string]: string } = {
-    flow: "Flow",
-    temp: "Temperature",
-    turb: "Turbidity",
-    ph: "pH",
-  };
-
   const selectData = createSelector(
     [(state) => state.sensorData, (state) => state.userData],
     (sensorDataRaw, userData) => {
@@ -28,63 +21,56 @@ export function RegulatorView() {
         .map((location) => {
           return {
             title: location,
-            items: userData.nodes
-              .filter((item) => item.location == location)
-              .flatMap((node) => {
-                let dataItem = sensorData.find(
-                  (sensorDataItem) => sensorDataItem.title == node.nodeId
-                );
+            items: Object.entries(
+              userData.nodes
+                .filter((item) => item.location == location)
+                .flatMap((node) => {
+                  let dataItem = sensorData.find(
+                    (sensorDataItem) => sensorDataItem.title == node.nodeId
+                  );
 
-                if (dataItem) {
-                  return [dataItem];
-                } else {
-                  return [];
-                }
-              })
-              .reduce((prev, curr) => {
-                prev.push(...curr.items);
-                return prev;
-              }, [] as Record<string, any>[])
-              .reduce((prev, curr) => {
-                if (prev.filter((item) => item.title == curr.title).length) {
-                  let i = 0;
-                  while (prev[i].title != curr.title) {
-                    i++;
+                  if (dataItem) {
+                    return [dataItem];
+                  } else {
+                    return [];
                   }
-                  prev[i].items.push(...curr.items);
-                } else {
-                  prev.push({ title: curr.title, items: [...curr.items] });
-                }
-                return prev;
-              }, [])
-              .map((item) => ({
-                title: item.title,
-                items: [
-                  ...Object.entries(
-                    item.items.reduce((prev, curr) => {
-                      if (!prev[curr.date]) {
-                        prev[curr.date] = [curr.value];
-                      } else {
-                        prev[curr.date].push(curr.value);
-                      }
-                      return prev;
-                    }, {})
-                  )
-                    .entries()
-                    .map(([index, [date, values]]) => ({
-                      date,
-                      value: (
-                        values.reduce(
-                          (prev, curr) => prev + parseFloat(curr),
-                          0
-                        ) / values.length
-                      ).toString(),
-                    })),
-                ].sort(
+                })
+                .reduce((prev, curr) => {
+                  prev.push(...curr.items);
+                  return prev;
+                }, [] as Record<string, any>[])
+                .reduce((prev, curr) => {
+                  if (!prev[curr.title]) {
+                    prev[curr.title] = [...curr.items];
+                  } else {
+                    prev[curr.title].push(...curr.items);
+                  }
+                  return prev;
+                }, {} as Record<string, any>)
+            ).map(([portType, readVals]) => ({
+              title: portType,
+              items: Object.entries(
+                readVals.reduce((prev, curr) => {
+                  if (!prev[curr.date]) {
+                    prev[curr.date] = [curr.value];
+                  } else {
+                    prev[curr.date].push(curr.value);
+                  }
+                  return prev;
+                }, {} as Record<string, any>)
+              )
+                .map(([date, values]) => ({
+                  date,
+                  value: (
+                    values.reduce((prev, curr) => prev + parseFloat(curr), 0) /
+                    values.length
+                  ).toString(),
+                }))
+                .sort(
                   (a, b) =>
                     new Date(a.date).getTime() - new Date(b.date).getTime()
                 ),
-              })),
+            })),
           };
         });
     }

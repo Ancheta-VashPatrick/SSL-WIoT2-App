@@ -17,14 +17,14 @@ export const labelFunc = (title: string) => {
   return (value) => `${value} ${meMap[title]}`;
 };
 
-export function ConsumerView() {
-  const typeMap: { [key: string]: string } = {
-    flow: "Flow",
-    temp: "Temperature",
-    turb: "Turbidity",
-    ph: "pH",
-  };
+export const typeMap: { [key: string]: string } = {
+  flow: "Flow",
+  temp: "Temperature",
+  turb: "Turbidity",
+  ph: "pH",
+};
 
+export function ConsumerView() {
   const selectData = createSelector(
     (state) => state.sensorData,
     (sensorData) =>
