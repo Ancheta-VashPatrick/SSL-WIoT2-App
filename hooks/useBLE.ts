@@ -144,10 +144,16 @@ function useBLE() {
           console.log(error);
         }
 
+        const nodes = store.getState().userData.nodes ?? [];
+
         if (
           device &&
           (device.localName?.startsWith("ESP32-WIOT2-") ||
-            device.name?.startsWith("ESP32-WIOT2-"))
+            device.name?.startsWith("ESP32-WIOT2-")) &&
+          nodes.find(
+            (node) =>
+              node.nodeId == device.name || node.nodeId == device.localName
+          )
         ) {
           dispatch(addDevice({ device: JSON.stringify(device) }));
           // console.log(store.getState().devicesData.items)
@@ -278,8 +284,9 @@ function useBLE() {
           let nodeId = device?.localName ?? device?.name ?? "DEFAULT";
           // .toLowerCase()
           // .slice(12);
-          dispatch(updateUploadNode({ nodeId, data: value }));
-          dispatch(updateNode({ nodeId, data: value }));
+          let data = value.filter((item) => item.type != "");
+          dispatch(updateUploadNode({ nodeId, data }));
+          dispatch(updateNode({ nodeId, data }));
           let newSuccess = getSuccess();
           let diffSuccess = newSuccess[nodeId] - (oldSuccess[nodeId] ?? 0);
           if (diffSuccess) {
@@ -339,16 +346,37 @@ function useBLE() {
 
       if (!characteristic?.value) {
         console.log("No Data was received");
-        return;
+        return { type: "", data: [] };
       }
 
       let rawVal = null;
       // Decrypt value
       try {
+        const nodeDetails =
+          (store.getState().userData.nodes ?? []).find(
+            (node) => node.nodeId == device?.name
+          ) ?? {};
+
+        let decodeKeys = [];
+
+        if (portNumber > 0) {
+          if (!nodeDetails["wqmKey"]) {
+            return { type: "", data: [] };
+          } else {
+            decodeKeys = nodeDetails["wqmKey"];
+          }
+        } else if (portNumber == 0) {
+          if (!nodeDetails["flowKey"]) {
+            return { type: "", data: [] };
+          } else {
+            decodeKeys = nodeDetails["flowKey"];
+          }
+        }
+
         rawVal = await Aes.decrypt(
           base64.decode(characteristic.value),
-          "5169702A48227366786F232B655A7337",
-          "46252662485B67397532362743784531",
+          decodeKeys[0],
+          decodeKeys[1],
           "aes-128-cbc"
         );
       } catch (error) {
