@@ -12,10 +12,14 @@ import useRequests from "@/hooks/useRequests";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/reducers";
+import { unregisterBackgroundFetchAsync } from "./_layout";
 
 export default function LoginScreen() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   useEffect(() => {
+    unregisterBackgroundFetchAsync().then(() =>
+      console.log("Background fetch unregistered.")
+    );
     dispatch(logout());
   }, []);
 
