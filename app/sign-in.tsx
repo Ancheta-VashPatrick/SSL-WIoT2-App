@@ -1,4 +1,5 @@
 import {
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -12,14 +13,21 @@ import useRequests from "@/hooks/useRequests";
 import { useRouter } from "expo-router";
 import { useDispatch } from "react-redux";
 import { logout } from "@/store/reducers";
-import { unregisterBackgroundFetchAsync } from "./_layout";
+import { isRegistered, unregisterBackgroundFetchAsync } from "./_layout";
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
   useEffect(() => {
-    unregisterBackgroundFetchAsync().then(() =>
-      console.log("Background fetch unregistered.")
-    );
+    const unregisterIfNeeded = async () => {
+      if (Platform.OS == "android" || Platform.OS == "ios") {
+        if (await isRegistered()) {
+          unregisterBackgroundFetchAsync().then(() =>
+            console.log("Background fetch unregistered.")
+          );
+        }
+      }
+    };
+    unregisterIfNeeded();
     dispatch(logout());
   }, []);
 

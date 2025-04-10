@@ -65,6 +65,10 @@ export async function unregisterBackgroundFetchAsync() {
   return BackgroundFetch.unregisterTaskAsync(BACKGROUND_FETCH_TASK);
 }
 
+export function isRegistered() {
+  return TaskManager.isTaskRegisteredAsync(BACKGROUND_FETCH_TASK);
+}
+
 let scanForDevices = () => console.log("Bluetooth Scan is not supported.");
 let oppCollect = () => console.log("Bluetooth Collection is not supported");
 if (Platform.OS == "android" || Platform.OS == "ios") {
