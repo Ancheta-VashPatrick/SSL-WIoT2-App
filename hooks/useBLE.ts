@@ -96,32 +96,35 @@ function useBLE() {
 
   const collectFromDevices = () => {
     if (!store.getState().sensorData.dataLock) {
-      dispatch(setLock(null));
-
       let currentDevicesData = store.getState().devicesData;
       if (currentDevicesData.items.length) {
-        currentDevicesData.items.forEach((deviceString) => {
-          // console.log(deviceString);
-          let deviceObject = JSON.parse(deviceString);
-          let device = new Device(
-            {
-              id: deviceObject.id,
-              name: deviceObject.name,
-              rssi: deviceObject.rssi,
-              mtu: deviceObject.mtu,
-              manufacturerData: deviceObject.manufacturerData,
-              rawScanRecord: deviceObject.rawScanRecord,
-              serviceData: deviceObject.serviceData,
-              serviceUUIDs: deviceObject.serviceUUID,
-              localName: deviceObject.localName,
-              txPowerLevel: deviceObject.txPowerLevel,
-              solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
-              isConnectable: deviceObject.isConnectable,
-              overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
-            },
-            bleManager
-          );
-          connectToDevice(device);
+        dispatch(setLock(null));
+        Promise.all(
+          currentDevicesData.items.map(async (deviceString) => {
+            // console.log(deviceString);
+            let deviceObject = JSON.parse(deviceString);
+            let device = new Device(
+              {
+                id: deviceObject.id,
+                name: deviceObject.name,
+                rssi: deviceObject.rssi,
+                mtu: deviceObject.mtu,
+                manufacturerData: deviceObject.manufacturerData,
+                rawScanRecord: deviceObject.rawScanRecord,
+                serviceData: deviceObject.serviceData,
+                serviceUUIDs: deviceObject.serviceUUID,
+                localName: deviceObject.localName,
+                txPowerLevel: deviceObject.txPowerLevel,
+                solicitedServiceUUIDs: deviceObject.solicitedServiceUUIDs,
+                isConnectable: deviceObject.isConnectable,
+                overflowServiceUUIDs: deviceObject.overflowServiceUUIDs,
+              },
+              bleManager
+            );
+            return connectToDevice(device);
+          })
+        ).then(() => {
+          dispatch(resetLock(null));
         });
       } else {
         dispatch(
@@ -130,8 +133,6 @@ function useBLE() {
           })
         );
       }
-
-      dispatch(resetLock(null));
     }
   };
 
@@ -139,28 +140,30 @@ function useBLE() {
     if (!store.getState().sensorData.dataLock) {
       dispatch(setLock(null));
 
-      bleManager.startDeviceScan(null, null, (error, device) => {
-        if (error) {
-          console.log(error);
-        }
+      bleManager
+        .startDeviceScan(null, null, (error, device) => {
+          if (error) {
+            console.log(error);
+          }
 
-        const nodes = store.getState().userData.nodes ?? [];
+          const nodes = store.getState().userData.nodes ?? [];
 
-        if (
-          device &&
-          (device.localName?.startsWith("ESP32-WIOT2-") ||
-            device.name?.startsWith("ESP32-WIOT2-")) &&
-          nodes.find(
-            (node) =>
-              node.nodeId == device.name || node.nodeId == device.localName
-          )
-        ) {
-          dispatch(addDevice({ device: JSON.stringify(device) }));
-          // console.log(store.getState().devicesData.items)
-        }
-      });
-
-      dispatch(resetLock(null));
+          if (
+            device &&
+            (device.localName?.startsWith("ESP32-WIOT2-") ||
+              device.name?.startsWith("ESP32-WIOT2-")) &&
+            nodes.find(
+              (node) =>
+                node.nodeId == device.name || node.nodeId == device.localName
+            )
+          ) {
+            dispatch(addDevice({ device: JSON.stringify(device) }));
+            // console.log(store.getState().devicesData.items)
+          }
+        })
+        .then(() => {
+          dispatch(resetLock(null));
+        });
     }
   };
 
@@ -171,7 +174,7 @@ function useBLE() {
         reject("Bluetooth connection timed out.");
       }, 15_000);
     });
-    Promise.race([
+    return Promise.race([
       new Promise(async (resolve, reject) => {
         try {
           const deviceConnection = await bleManager.connectToDevice(device.id);
@@ -186,7 +189,7 @@ function useBLE() {
       }),
       newTimeout,
     ]).then(
-      (deviceConnection) => {
+      async (deviceConnection) => {
         // startStreamingData(deviceConnection);
         if (currentDevicesData.marks[device?.id]) {
           dispatch(
@@ -206,7 +209,7 @@ function useBLE() {
               message: `Detected ${device?.name}, attempting to collect...`,
             })
           );
-          startReadingPorts(deviceConnection);
+          return startReadingPorts(deviceConnection);
         }
       },
       (error) => {
@@ -270,7 +273,7 @@ function useBLE() {
       }, 15_000);
     });
     let oldSuccess = getSuccess();
-    Promise.race([
+    return Promise.race([
       Promise.all(
         CHARACTERISTIC_UUIDS.map(
           async (item, index) => await readPort(device, index)
