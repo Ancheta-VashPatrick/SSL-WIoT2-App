@@ -272,7 +272,10 @@ function useBLE() {
         reject("Port reading timed out.");
       }, 15_000);
     });
-    console.log(new Date().toISOString(), `Started reading ports from ${device?.name ?? device?.localName}`)
+    console.log(
+      new Date().toISOString(),
+      `Started reading ports from ${device?.name ?? device?.localName}`
+    );
     let oldSuccess = getSuccess();
     return Promise.race([
       Promise.all(
@@ -394,7 +397,11 @@ function useBLE() {
       if (rawVal) {
         try {
           const readVal = rawVal.slice(5, -1);
-          console.log(new Date().toISOString(), device?.name ?? device?.localName, rawVal);
+          console.log(
+            new Date().toISOString(),
+            device?.name ?? device?.localName,
+            rawVal
+          );
           let rawPortType = rawVal.slice(0, 4);
           const portType =
             rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
@@ -445,7 +452,11 @@ function useBLE() {
           }
 
           // console.log(rawVal);
-          return { type: portType, data: readValsBuffer };
+          if (readValsBuffer.length) {
+            return { type: portType, data: readValsBuffer };
+          } else {
+            return null;
+          }
         } catch (error) {
           console.log(error);
           if (numCalls < 3) {
