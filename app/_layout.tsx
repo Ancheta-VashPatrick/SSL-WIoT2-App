@@ -32,14 +32,16 @@ TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
     `Got background fetch call at date: ${new Date(now).toISOString()}`
   );
 
-  const dispatch = store.dispatch;
-  dispatch(
-    addLog({
-      message: "Collection automatically initiated.",
-    })
-  );
+  if (!store.getState().sensorData.dataLock) {
+    const dispatch = store.dispatch;
+    dispatch(
+      addLog({
+        message: "Collection automatically initiated.",
+      })
+    );
 
-  oppCollect();
+    oppCollect();
+  }
 
   setTimeout(() => {
     const { uploadData } = useRequests();
