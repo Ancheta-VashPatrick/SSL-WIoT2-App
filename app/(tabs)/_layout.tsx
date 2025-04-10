@@ -7,16 +7,26 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { registerBackgroundFetchAsync, scanForDevices } from "@/app/_layout";
+import {
+  isRegistered,
+  registerBackgroundFetchAsync,
+  scanForDevices,
+} from "@/app/_layout";
 import { useSelector } from "react-redux";
 
 export default function TabLayout() {
   useEffect(() => {
     if (Platform.OS == "android" || Platform.OS == "ios") {
       scanForDevices();
-      registerBackgroundFetchAsync().then(() =>
-        console.log("Background fetch registered.")
-      );
+
+      const registerIfNeeded = async () => {
+        if (!(await isRegistered())) {
+          registerBackgroundFetchAsync().then(() =>
+            console.log("Background fetch registered.")
+          );
+        }
+      };
+      registerIfNeeded();
     }
   }, []);
 
