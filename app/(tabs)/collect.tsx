@@ -62,44 +62,11 @@ export default function CollectScreen() {
 
     const dispatch = useDispatch();
 
-    const [mockupIndex, setMockupIndex] = useState(0);
     const logData = useSelector((state) => state.logData);
 
     const clearTheLog = () => {
-      setMockupIndex(0);
       dispatch(clearLog(null));
     };
-
-    const mockupLog = [
-      {
-        message: "Scanned the area, found 'coe199node'.",
-      },
-      {
-        message: "Successfully collected 40 data points from 'coe199node'.",
-      },
-      {
-        message: "Scanned the area, no nodes nearby.",
-      },
-      {
-        message: "Collection manually initiated.",
-      },
-      {
-        message: "Successfully collected 40 data points from 'sn1'.",
-      },
-      {
-        message: "[ERROR] Upload failed. Trying again in 10 seconds...",
-      },
-      {
-        message: "[ERROR] Upload failed. Trying again in 30 seconds...",
-      },
-      {
-        message: "[ERROR] Upload failed. Trying again in 60 seconds...",
-      },
-      {
-        date: "2025-03-17 13:34",
-        message: "Successfully uploaded 80 data points.",
-      },
-    ];
 
     const widthDivisions = logData.items.length ? 3 : 2;
     const widthPortion = (logData.items.length ? 95 : 97) / widthDivisions;
@@ -158,7 +125,7 @@ export default function CollectScreen() {
       ctaButton: {
         width: `${widthPortion}%`,
         maxWidth: `${widthPortion}%`,
-        backgroundColor: "#FF6060",
+        backgroundColor: "#0460D9",
         justifyContent: "center",
         alignItems: "center",
         height: 50,
@@ -198,7 +165,7 @@ export default function CollectScreen() {
         }
       >
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Collect</ThemedText>
+          <ThemedText type="title">FloWais Collect</ThemedText>
         </ThemedView>
 
         <ThemedText>

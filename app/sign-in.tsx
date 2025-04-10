@@ -74,7 +74,7 @@ export default function LoginScreen() {
       width: Math.min(windowWidth * 0.3, 250),
     },
     ctaButton: {
-      backgroundColor: "#FF6060",
+      backgroundColor: "#0460D9",
       justifyContent: "center",
       alignItems: "center",
       marginHorizontal: 5,
@@ -92,7 +92,7 @@ export default function LoginScreen() {
   return (
     <>
       <ThemedView style={styles.container}>
-        <ThemedText type="title">Please log in.</ThemedText>
+        <ThemedText type="title">Welcome to FloWais!</ThemedText>
         <TextInput
           style={styles.input}
           onChangeText={setUsername}

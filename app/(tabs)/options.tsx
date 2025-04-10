@@ -28,7 +28,7 @@ export default function OptionsScreen() {
       }
     >
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Options</ThemedText>
+        <ThemedText type="title">FloWais Options</ThemedText>
       </ThemedView>
       <TouchableOpacity onPress={logoutBtn} style={styles.ctaButton}>
         <ThemedText style={styles.ctaButtonText}>Log Out</ThemedText>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
   ctaButton: {
     width: "100%",
-    backgroundColor: "#FF6060",
+    backgroundColor: "#0460D9",
     justifyContent: "center",
     alignItems: "center",
     height: 50,

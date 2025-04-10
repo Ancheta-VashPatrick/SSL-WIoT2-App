@@ -43,7 +43,7 @@ export default function DashboardScreen() {
         }
       >
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Dashboard</ThemedText>
+          <ThemedText type="title">FloWais Dashboard</ThemedText>
         </ThemedView>
 
         {role == "concessionaire" ? (
