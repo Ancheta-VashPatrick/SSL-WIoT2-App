@@ -30,7 +30,7 @@ export function removeDuplicates(
   existing: DataElement[] = []
 ): DataElement[] {
   let result: DataElement[] = [];
-  input.forEach((item) => {
+  (input ?? []).forEach((item) => {
     // console.log(item, result.filter((pastItem) => pastItem.date == item.date));
     if (checkDuplicates(item, result) && checkDuplicates(item, existing)) {
       let i = 0;

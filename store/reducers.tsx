@@ -47,15 +47,17 @@ const sensorSlice = createSlice({
             let newReadVals: DataElement[][] = [];
 
             data.forEach((item, index) => {
-              newPortTypes.push(item.type);
-              let newReadValsItem: DataElement[] = [];
-              if (item.type == (state.items[i].portTypes[index] ?? "")) {
-                newReadValsItem = state.items[i].readVals[index];
+              if (item && item.data) {
+                newPortTypes.push(item.type);
+                let newReadValsItem: DataElement[] = [];
+                if (item.type == (state.items[i].portTypes[index] ?? "")) {
+                  newReadValsItem = state.items[i].readVals[index];
+                }
+                newReadValsItem.push(...item.data);
+                newReadVals.push(
+                  removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+                );
               }
-              newReadValsItem.push(...item.data);
-              newReadVals.push(
-                removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
-              );
             });
 
             newReadVals.forEach((item) => {
@@ -206,17 +208,19 @@ const sensorSlice = createSlice({
             let newReadVals: DataElement[][] = [];
 
             data.forEach((item, index) => {
-              newPortTypes.push(item.type);
-              let newReadValsItem: DataElement[] = [];
-              if (
-                item.type == (state.downloadItems[i].portTypes[index] ?? "")
-              ) {
-                newReadValsItem = state.downloadItems[i].readVals[index];
+              if (item && item.data) {
+                newPortTypes.push(item.type);
+                let newReadValsItem: DataElement[] = [];
+                if (
+                  item.type == (state.downloadItems[i].portTypes[index] ?? "")
+                ) {
+                  newReadValsItem = state.downloadItems[i].readVals[index];
+                }
+                newReadValsItem.push(...item.data);
+                newReadVals.push(
+                  removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
+                );
               }
-              newReadValsItem.push(...item.data);
-              newReadVals.push(
-                removeDuplicates(newReadValsItem, MAX_UPLOAD_DATA_ITEMS)
-              );
             });
 
             newReadVals.forEach((item) => {
