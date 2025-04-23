@@ -1,4 +1,9 @@
-import { StyleSheet, useColorScheme, type ViewProps } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  useColorScheme,
+  type ViewProps,
+} from "react-native";
 
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
@@ -54,21 +59,61 @@ export function ChartView({
 
   const getColor = (type: string) => Colors[useColorScheme() ?? "light"][type];
 
+  const portIcons =
+    (useColorScheme() ?? "light") == "light"
+      ? {
+          L: require("@/assets/images/flow.svg"),
+          NTU: require("@/assets/images/turb.svg"),
+          "°C": require("@/assets/images/temp.svg"),
+          pH: require("@/assets/images/ph.svg"),
+        }
+      : {
+          L: require("@/assets/images/flow-dark.svg"),
+          NTU: require("@/assets/images/turb-dark.svg"),
+          "°C": require("@/assets/images/temp-dark.svg"),
+          pH: require("@/assets/images/ph-dark.svg"),
+        };
+
   const textColor = getColor("text");
 
   const titleUnits = labelUnits("").trim();
 
+  const styles = StyleSheet.create({
+    ctaText: {
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+    },
+    titleContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "row",
+    },
+    titleImage: procData.length
+      ? {
+          height: 36,
+          width: 36,
+          marginLeft: -36,
+          marginRight: 5,
+          marginVertical: 7.5,
+        }
+      : { height: 36, width: 36, marginLeft: -36 },
+  });
+
   return (
     <ThemedView>
-      <ThemedText style={styles.ctaText} type="subtitle">
-        {title}
-        {data &&
-        titleUnits != "pH" &&
-        procData.length > 1 &&
-        !procData.every((val) => val.y === procData[0].y)
-          ? ` (${titleUnits})`
-          : ""}
-      </ThemedText>
+      <ThemedView style={styles.titleContainer}>
+        <Image source={portIcons[titleUnits]} style={styles.titleImage} />
+        <ThemedText style={styles.ctaText} type="subtitle">
+          {title}
+          {data &&
+          titleUnits != "pH" &&
+          procData.length > 1 &&
+          !procData.every((val) => val.y === procData[0].y)
+            ? ` (${titleUnits})`
+            : ""}
+        </ThemedText>
+      </ThemedView>
       {data && procData.length > 1 ? (
         procData.every((val) => val.y === procData[0].y) ? (
           <>
@@ -206,11 +251,3 @@ export function ChartView({
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  ctaText: {
-    justifyContent: "center",
-    alignItems: "center",
-    textAlign: "center",
-  },
-});

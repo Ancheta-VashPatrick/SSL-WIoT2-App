@@ -43,6 +43,12 @@ export default function OptionsScreen() {
             Pixabay from Pexels
           </ExternalLink>
         </ThemedText>
+        <ThemedText type="subtitle">
+          Port Icons from{" "}
+          <ExternalLink href="https://www.svgrepo.com/">
+            SVG Repo
+          </ExternalLink>
+        </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
   );
