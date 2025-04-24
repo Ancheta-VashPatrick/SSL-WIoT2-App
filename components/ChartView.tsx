@@ -1,9 +1,10 @@
 import {
-  Image,
   StyleSheet,
   useColorScheme,
   type ViewProps,
 } from "react-native";
+
+import { Image } from "expo-image";
 
 import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
@@ -103,7 +104,10 @@ export function ChartView({
   return (
     <ThemedView>
       <ThemedView style={styles.titleContainer}>
-        <Image source={portIcons[titleUnits]} style={styles.titleImage} />
+        <Image
+          source={portIcons[titleUnits]}
+          style={styles.titleImage}
+        />
         <ThemedText style={styles.ctaText} type="subtitle">
           {title}
           {data &&

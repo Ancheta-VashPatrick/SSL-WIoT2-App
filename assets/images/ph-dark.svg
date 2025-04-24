@@ -8,30 +8,11 @@
    version="1.1"
    class="si-glyph si-glyph-test-tube"
    id="svg3"
-   sodipodi:docname="ph-dark.svg"
-   inkscape:version="1.4.1-rc (06eac75fbf, 2025-03-29)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview3"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.84941202"
-     inkscape:cx="416.75888"
-     inkscape:cy="503.28932"
-     inkscape:window-width="1854"
-     inkscape:window-height="1211"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="g1" />
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <title
      id="title1">Test-tube</title>
   <defs
@@ -55,8 +36,7 @@
            d="m 10.4215,0.985 c 0,-0.937 -0.091,-0.938 -1.05,-0.938 h -6.741 c -0.958,0 -1.052,0.001 -1.052,0.938 h 0.953 v 2.94 l -3.012,10.329 c 0,0.939 0.777,1.699 1.736,1.699 h 9.489 c 0.958,0 1.736,-0.76 1.736,-1.699 L 9.4925,3.895 9.4785,0.985 Z m 0.248,11.837 c 0.271,0.884 -0.203,1.435 -1.432,1.435 h -6.375 c -1.401,0 -1.745,-0.593 -1.432,-1.435 L 4.2165,3.97 4.2055,1.757 h 3.525 v 2.189 z"
            class="si-glyph-fill"
            id="path1"
-           style="fill:#ffffff"
-           sodipodi:nodetypes="cssccccsscccccsscccccc" />
+           style="fill:#ffffff" />
         <path
            d="m 7.5395,5.487 h -3.02 l -1.838,6.308 c -0.355,1.15 -0.24,1.584 1.408,1.584 h 3.879 c 1.633,0 1.67,-0.518 1.409,-1.584 z"
            class="si-glyph-fill"
@@ -72,4 +52,13 @@
          y="0" />
     </g>
   </g>
+  <metadata
+     id="metadata1">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Test-tube</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
 </svg>

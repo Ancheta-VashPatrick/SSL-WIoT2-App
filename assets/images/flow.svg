@@ -7,32 +7,10 @@
    viewBox="0 0 48 48"
    version="1.1"
    id="svg2"
-   sodipodi:docname="flow.svg"
-   inkscape:version="1.4.1-rc (06eac75fbf, 2025-03-29)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs2" />
-  <sodipodi:namedview
-     id="namedview2"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.84941202"
-     inkscape:cx="501.52339"
-     inkscape:cy="330.22843"
-     inkscape:window-width="1854"
-     inkscape:window-height="1211"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="g2" />
   <g
      id="Layer_2"
      data-name="Layer 2">
@@ -60,7 +38,6 @@
         <path
            d="m 10.689928,28.583971 h 2.618358 V 20.94701 c -0.0644,-1.833625 1.439348,-3.337371 3.272973,-3.272973 H 37.310093 V 15.055658 H 15.27207 c -2.797834,0 -4.582142,2.1658 -4.582142,4.582185 z"
            id="path3"
-           sodipodi:nodetypes="ccccccssc"
            style="fill:#0000ff;stroke-width:1.09099" />
       </g>
     </g>
