@@ -380,6 +380,13 @@ function useBLE() {
           }
         }
 
+        console.log(
+          new Date().toISOString(),
+          device?.name ?? device?.localName,
+          portNumber,
+          base64.decode(characteristic.value)
+        );
+
         rawVal = await Aes.decrypt(
           base64.decode(characteristic.value),
           decodeKeys[0],
@@ -400,6 +407,7 @@ function useBLE() {
           console.log(
             new Date().toISOString(),
             device?.name ?? device?.localName,
+            portNumber,
             rawVal
           );
           let rawPortType = rawVal.slice(0, 4);
