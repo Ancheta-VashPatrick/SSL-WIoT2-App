@@ -16,6 +16,10 @@ function useRequests() {
   async function createEntry(data, recordedAt) {
     // console.log(JSON.stringify(data));
     // console.log("start", JSON.stringify(data));
+    const startTime = new Date();
+    // console.log(
+    //   startTime.toISOString(),
+    // );
     try {
       const response = await fetch(url + "/sensor-data", {
         method: "POST",
@@ -29,6 +33,12 @@ function useRequests() {
       // console.log(JSON.stringify(data));
       // console.log(newData);
       // console.log(response.status);
+      const timeDiff = (new Date()).getTime() - startTime.getTime()
+      console.log(
+          new Date().toISOString(),
+          response.status,
+          timeDiff
+        );
       if (
         response.status == 201 &&
         newData.message == "Sensor data record created successfully"

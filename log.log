@@ -1,0 +1,194 @@
+Starting project at /home/ssl-wiot2/Projects/SSL-WIoT2-App
+Starting Metro Bundler
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Android Bundled 5603ms node_modules/expo-router/entry.js (1563 modules)
+ (NOBRIDGE) LOG  Bridgeless mode is enabled
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ (NOBRIDGE) ERROR  redux-persist failed to create sync storage. falling back to noop storage. [Component Stack]
+ (NOBRIDGE) LOG  Background fetch unregistered.
+ (NOBRIDGE) WARN  Selector unknown returned a different result when called with the same parameters. This can lead to unnecessary rerenders.
+Selectors that return a new reference (such as an object or an array) should be memoized: https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization {"selected": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "selected2": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "stack": "Error
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192460:34)
+    at memoizedSelector (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136152:36)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136171:34)
+    at mountSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:50530:37)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:51355:42)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:7706:47)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136176:39)
+    at useSelector2 (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192492:78)
+    at DashboardScreen (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:211431:48)
+    at renderWithHooks (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:49978:33)
+    at mountIndeterminateComponent (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:53857:34)
+    at beginWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:55094:49)
+    at performUnitOfWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59935:27)
+    at workLoopSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59704:28)
+    at renderRootSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59670:25)
+    at performSyncWorkOnRoot (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59238:40)
+    at flushSyncWorkAcrossRoots_impl (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46988:40)
+    at flushSyncWorkOnAllRoots (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46954:38)
+    at processRootScheduleInMicrotask (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:47077:32)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:47230:15)", "state": {"devicesData": {"connectedDevice": null, "items": [Array], "marks": [Object]}, "logData": {"items": [Array]}, "sensorData": {"dataLock": false, "downloadItems": [Array], "items": [Array], "uploadItems": [Array]}, "serverApi": {"config": [Object], "mutations": [Object], "provided": [Object], "queries": [Object], "subscriptions": [Object]}, "userData": {"exp": "2025-05-08T10:35:36.000Z", "nodes": [Array], "role": "consumer", "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpY2t5d2lja3kiLCJyb2xlIjoiY29uc3VtZXIiLCJpYXQiOjE3NDY2Nzg5MzYsImV4cCI6MTc0NjcwMDUzNn0.GU7f7tBbSaBWAofsSh3NDNUwPz5BlohEQOIao-tmiGc", "username": "rickywicky"}}} [Component Stack]
+ (NOBRIDGE) LOG  Background fetch registered.
+ (NOBRIDGE) WARN  Selector unknown returned a different result when called with the same parameters. This can lead to unnecessary rerenders.
+Selectors that return a new reference (such as an object or an array) should be memoized: https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization {"selected": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "selected2": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "stack": "Error
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192460:34)
+    at memoizedSelector (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136152:36)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136171:34)
+    at mountSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:50530:37)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:51355:42)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:7706:47)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136176:39)
+    at useSelector2 (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192492:78)
+    at DashboardScreen (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:211431:48)
+    at renderWithHooks (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:49978:33)
+    at mountIndeterminateComponent (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:53857:34)
+    at beginWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:55094:49)
+    at performUnitOfWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59935:27)
+    at workLoopSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59704:28)
+    at renderRootSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59670:25)
+    at performSyncWorkOnRoot (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59238:40)
+    at flushSyncWorkAcrossRoots_impl (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46988:40)
+    at flushSyncWorkOnAllRoots (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46954:38)
+    at commitRootImpl (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:60444:32)
+    at commitRoot (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:60216:25)
+    at commitRootWhenReady (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59147:19)
+    at finishConcurrentRender (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59118:30)
+    at performConcurrentWorkOnRoot (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:58982:37)", "state": {"devicesData": {"connectedDevice": null, "items": [Array], "marks": [Object]}, "logData": {"items": [Array]}, "sensorData": {"dataLock": false, "downloadItems": [Array], "items": [Array], "uploadItems": [Array]}, "serverApi": {"config": [Object], "mutations": [Object], "provided": [Object], "queries": [Object], "subscriptions": [Object]}, "userData": {"exp": "2025-05-08T10:35:36.000Z", "nodes": [Array], "role": "consumer", "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpY2t5d2lja3kiLCJyb2xlIjoiY29uc3VtZXIiLCJpYXQiOjE3NDY2Nzg5MzYsImV4cCI6MTc0NjcwMDUzNn0.GU7f7tBbSaBWAofsSh3NDNUwPz5BlohEQOIao-tmiGc", "username": "rickywicky"}}} [Component Stack]
+Android Bundled 274ms node_modules/expo-router/entry.js (1 module)
+ (NOBRIDGE) LOG  Bridgeless mode is enabled
+ INFO  
+[7m [1m💡 JavaScript logs will be removed from Metro in React Native 0.77![22m Please use React Native DevTools as your default tool. Tip: Type [1mj[22m in the terminal to open (requires Google Chrome or Microsoft Edge).[27m
+ (NOBRIDGE) ERROR  redux-persist failed to create sync storage. falling back to noop storage. [Component Stack]
+ (NOBRIDGE) LOG  Background fetch unregistered.
+ (NOBRIDGE) WARN  Selector unknown returned a different result when called with the same parameters. This can lead to unnecessary rerenders.
+Selectors that return a new reference (such as an object or an array) should be memoized: https://redux.js.org/usage/deriving-data-selectors#optimizing-selectors-with-memoization {"selected": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "selected2": ["ESP32-WIOT2-SN1", "ESP32-WIOT2-SN2", "ESP32-WIOT2-SN3", "ESP32-WIOT2-SN4", "ESP32-WIOT2-SN5"], "stack": "Error
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192460:34)
+    at memoizedSelector (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136152:36)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136171:34)
+    at mountSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:50530:37)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:51355:42)
+    at useSyncExternalStore (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:7706:47)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:136176:39)
+    at useSelector2 (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:192492:78)
+    at DashboardScreen (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:211433:48)
+    at renderWithHooks (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:49978:33)
+    at mountIndeterminateComponent (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:53857:34)
+    at beginWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:55094:49)
+    at performUnitOfWork (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59935:27)
+    at workLoopSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59704:28)
+    at renderRootSync (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59670:25)
+    at performSyncWorkOnRoot (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:59238:40)
+    at flushSyncWorkAcrossRoots_impl (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46988:40)
+    at flushSyncWorkOnAllRoots (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:46954:38)
+    at processRootScheduleInMicrotask (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:47077:32)
+    at anonymous (http://10.158.66.65:8081/node_modules/expo-router/entry.bundle//&platform=android&dev=true&hot=false&transform.engine=hermes&transform.bytecode=1&transform.routerRoot=app&unstable_transformProfile=hermes-stable:47230:15)", "state": {"devicesData": {"connectedDevice": null, "items": [Array], "marks": [Object]}, "logData": {"items": [Array]}, "sensorData": {"dataLock": false, "downloadItems": [Array], "items": [Array], "uploadItems": [Array]}, "serverApi": {"config": [Object], "mutations": [Object], "provided": [Object], "queries": [Object], "subscriptions": [Object]}, "userData": {"exp": "2025-05-08T10:36:10.000Z", "nodes": [Array], "role": "consumer", "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJpY2t5d2lja3kiLCJyb2xlIjoiY29uc3VtZXIiLCJpYXQiOjE3NDY2Nzg5NzAsImV4cCI6MTc0NjcwMDU3MH0.bf0YrY7Ot5m2ObUNXrVgvCKLsQjzuv8jNG3uHe9LW64", "username": "rickywicky"}}} [Component Stack]
+ (NOBRIDGE) LOG  Background fetch registered.
+ (NOBRIDGE) LOG  FAILED TO CONNECT [BleError: Device D0:EF:76:57:82:E6 was disconnected]
+ (NOBRIDGE) LOG  FAILED TO CONNECT [BleError: Device D0:EF:76:57:82:E6 was disconnected]
+ (NOBRIDGE) LOG  2025-05-08T05:00:35.850Z 201 1547
+ (NOBRIDGE) LOG  2025-05-08T05:00:36.094Z 201 1788
+ (NOBRIDGE) LOG  2025-05-08T05:00:36.338Z 201 2031
+ (NOBRIDGE) LOG  2025-05-08T05:00:36.580Z 201 2275
+ (NOBRIDGE) LOG  2025-05-08T05:00:36.833Z 201 2529
+ (NOBRIDGE) LOG  2025-05-08T05:00:37.072Z 201 2763
+ (NOBRIDGE) LOG  2025-05-08T05:00:37.328Z 201 3020
+ (NOBRIDGE) LOG  2025-05-08T05:00:37.572Z 201 3260
+ (NOBRIDGE) LOG  2025-05-08T05:00:37.815Z 201 3505
+ (NOBRIDGE) LOG  2025-05-08T05:00:38.055Z 201 3744
+ (NOBRIDGE) LOG  2025-05-08T05:00:38.302Z 201 3989
+ (NOBRIDGE) LOG  2025-05-08T05:00:38.549Z 201 4234
+ (NOBRIDGE) LOG  2025-05-08T05:00:38.791Z 201 4477
+ (NOBRIDGE) LOG  2025-05-08T05:00:39.033Z 201 4717
+ (NOBRIDGE) LOG  2025-05-08T05:00:39.277Z 201 4960
+ (NOBRIDGE) LOG  2025-05-08T05:00:39.519Z 201 5201
+ (NOBRIDGE) LOG  2025-05-08T05:00:39.764Z 201 5445
+ (NOBRIDGE) LOG  2025-05-08T05:00:40.006Z 201 5684
+ (NOBRIDGE) LOG  2025-05-08T05:00:40.247Z 201 5927
+ (NOBRIDGE) LOG  2025-05-08T05:00:40.492Z 201 6171
+ (NOBRIDGE) LOG  2025-05-08T05:00:40.736Z 201 6413
+ (NOBRIDGE) LOG  2025-05-08T05:00:40.982Z 201 6658
+ (NOBRIDGE) LOG  2025-05-08T05:00:41.258Z 201 6922
+ (NOBRIDGE) LOG  2025-05-08T05:00:41.503Z 201 7177
+ (NOBRIDGE) LOG  2025-05-08T05:00:41.746Z 201 7419
+ (NOBRIDGE) LOG  2025-05-08T05:00:41.990Z 201 7665
+ (NOBRIDGE) LOG  2025-05-08T05:00:42.231Z 201 7903
+ (NOBRIDGE) LOG  2025-05-08T05:00:42.474Z 201 8144
+ (NOBRIDGE) LOG  2025-05-08T05:00:42.720Z 201 8389
+ (NOBRIDGE) LOG  2025-05-08T05:00:42.965Z 201 8635
+ (NOBRIDGE) LOG  2025-05-08T05:00:43.209Z 201 8880
+ (NOBRIDGE) LOG  2025-05-08T05:00:43.452Z 201 9118
+ (NOBRIDGE) LOG  2025-05-08T05:00:43.693Z 201 9361
+ (NOBRIDGE) LOG  2025-05-08T05:00:43.935Z 201 9598
+ (NOBRIDGE) LOG  2025-05-08T05:00:44.176Z 201 9841
+ (NOBRIDGE) LOG  2025-05-08T05:00:44.418Z 201 10085
+ (NOBRIDGE) LOG  2025-05-08T05:00:44.665Z 201 10331
+ (NOBRIDGE) LOG  2025-05-08T05:00:44.921Z 201 10584
+ (NOBRIDGE) LOG  2025-05-08T05:00:45.165Z 201 10827
+ (NOBRIDGE) LOG  2025-05-08T05:00:45.409Z 201 11070
+ (NOBRIDGE) LOG  2025-05-08T05:00:45.651Z 201 11312
+ (NOBRIDGE) LOG  2025-05-08T05:00:45.895Z 201 11555
+ (NOBRIDGE) LOG  2025-05-08T05:00:46.133Z 201 11792
+ (NOBRIDGE) LOG  2025-05-08T05:00:46.372Z 201 12030
+ (NOBRIDGE) LOG  2025-05-08T05:00:46.616Z 201 12273
+ (NOBRIDGE) LOG  2025-05-08T05:00:46.861Z 201 12517
+ (NOBRIDGE) LOG  2025-05-08T05:00:47.101Z 201 12757
+ (NOBRIDGE) LOG  2025-05-08T05:00:47.345Z 201 12998
+ (NOBRIDGE) LOG  2025-05-08T05:00:47.589Z 201 13244
+ (NOBRIDGE) LOG  2025-05-08T05:00:47.828Z 201 13482
+ (NOBRIDGE) LOG  2025-05-08T05:00:48.074Z 201 13726
+ (NOBRIDGE) LOG  2025-05-08T05:00:48.320Z 201 13973
+ (NOBRIDGE) LOG  2025-05-08T05:00:48.561Z 201 14211
+ (NOBRIDGE) LOG  2025-05-08T05:00:48.809Z 201 14460
+ (NOBRIDGE) LOG  2025-05-08T05:00:49.080Z 201 14730
+ (NOBRIDGE) LOG  2025-05-08T05:00:49.321Z 201 14970
+ (NOBRIDGE) LOG  2025-05-08T05:00:49.563Z 201 15211
+ (NOBRIDGE) LOG  2025-05-08T05:00:49.818Z 201 15464
+ (NOBRIDGE) LOG  2025-05-08T05:00:50.062Z 201 15707
+ (NOBRIDGE) LOG  2025-05-08T05:00:50.309Z 201 15956
+ (NOBRIDGE) LOG  2025-05-08T05:00:50.554Z 201 16202
+ (NOBRIDGE) LOG  2025-05-08T05:00:50.795Z 201 16440
+ (NOBRIDGE) LOG  2025-05-08T05:00:51.057Z 201 16701
+ (NOBRIDGE) LOG  2025-05-08T05:00:51.305Z 201 16948
+ (NOBRIDGE) LOG  2025-05-08T05:00:51.549Z 201 17191
+ (NOBRIDGE) LOG  2025-05-08T05:00:51.791Z 201 17433
+ (NOBRIDGE) LOG  2025-05-08T05:00:52.029Z 201 17670
+ (NOBRIDGE) LOG  2025-05-08T05:00:52.268Z 201 17908
+ (NOBRIDGE) LOG  2025-05-08T05:00:52.510Z 201 18150
+ (NOBRIDGE) LOG  2025-05-08T05:00:52.762Z 201 18401
+ (NOBRIDGE) LOG  2025-05-08T05:00:53.005Z 201 18643
+ (NOBRIDGE) LOG  2025-05-08T05:00:53.245Z 201 18882
+ (NOBRIDGE) LOG  2025-05-08T05:00:53.489Z 201 19126
+ (NOBRIDGE) LOG  2025-05-08T05:00:53.729Z 201 19365
+ (NOBRIDGE) LOG  2025-05-08T05:00:53.974Z 201 19609
+ (NOBRIDGE) LOG  2025-05-08T05:00:54.221Z 201 19854
+ (NOBRIDGE) LOG  2025-05-08T05:00:54.466Z 201 20100
+ (NOBRIDGE) LOG  2025-05-08T05:00:54.709Z 201 20342
+ (NOBRIDGE) LOG  2025-05-08T05:00:54.949Z 201 20581
+ (NOBRIDGE) LOG  2025-05-08T05:00:55.192Z 201 20823
+ (NOBRIDGE) LOG  2025-05-08T05:00:55.433Z 201 21063
+ (NOBRIDGE) LOG  2025-05-08T05:00:55.673Z 201 21303
+ (NOBRIDGE) LOG  2025-05-08T05:00:55.920Z 201 21549
+ (NOBRIDGE) LOG  2025-05-08T05:00:56.161Z 201 21789
+ (NOBRIDGE) LOG  2025-05-08T05:00:56.400Z 201 22028
+ (NOBRIDGE) LOG  2025-05-08T05:00:56.654Z 201 22281
+ (NOBRIDGE) LOG  2025-05-08T05:00:56.898Z 201 22524
+ (NOBRIDGE) LOG  2025-05-08T05:00:57.138Z 201 22763
+ (NOBRIDGE) LOG  2025-05-08T05:00:57.378Z 201 23002
+ (NOBRIDGE) LOG  2025-05-08T05:00:57.618Z 201 23242
+ (NOBRIDGE) LOG  2025-05-08T05:00:57.861Z 201 23484
+ (NOBRIDGE) LOG  2025-05-08T05:00:58.101Z 201 23723
+ (NOBRIDGE) LOG  2025-05-08T05:00:58.340Z 201 23962
+ (NOBRIDGE) LOG  2025-05-08T05:00:58.579Z 201 24200
+ (NOBRIDGE) LOG  2025-05-08T05:00:58.822Z 201 24442
+ (NOBRIDGE) LOG  2025-05-08T05:00:59.064Z 201 24682
+ (NOBRIDGE) LOG  2025-05-08T05:00:59.303Z 201 24922
+ (NOBRIDGE) LOG  2025-05-08T05:00:59.543Z 201 25161
+ (NOBRIDGE) LOG  2025-05-08T05:01:16.079Z 201 516
+ (NOBRIDGE) LOG  2025-05-08T05:01:16.340Z 201 775
+ (NOBRIDGE) LOG  2025-05-08T05:01:16.581Z 201 1017
+ (NOBRIDGE) LOG  2025-05-08T05:01:16.827Z 201 1266
+ (NOBRIDGE) LOG  2025-05-08T05:01:17.091Z 201 1525
+ (NOBRIDGE) LOG  2025-05-08T05:01:17.333Z 201 1766
+ (NOBRIDGE) LOG  2025-05-08T05:01:17.575Z 201 2007
