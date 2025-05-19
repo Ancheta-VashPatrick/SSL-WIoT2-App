@@ -23,6 +23,10 @@ import {
 } from "@/store/reducers";
 import { store } from "@/store/store";
 
+
+import useRequests from "@/hooks/useRequests";
+const { uploadData } = useRequests();
+
 const DATA_SERVICE_UUID = "19b10000-e8f2-537e-4f6c-d104768a1214";
 const CHARACTERISTIC_UUIDS = [
   "19b10001-e8f2-537e-4f6c-d104768a1217",
@@ -125,6 +129,10 @@ function useBLE() {
           })
         ).then(() => {
           dispatch(resetLock(null));
+          let currentUploadData = store.getState().sensorData.uploadItems;
+          if (currentUploadData.length) {
+            uploadData();
+          }
         });
       } else {
         dispatch(

@@ -28,6 +28,10 @@ export default function CollectScreen() {
 
     useEffect(() => {
       scanForDevices();
+
+      setInterval(() => {
+        oppCollect();
+      }, 20000);
     }, []);
 
     const devicesData = store.getState().devicesData;
