@@ -48,10 +48,15 @@ const sensorSlice = createSlice({
 
             data.forEach((item, index) => {
               if (item && item.data) {
-                newPortTypes.push(item.type);
                 let newReadValsItem: DataElement[] = [];
-                if (item.type == (state.items[i].portTypes[index] ?? "")) {
+                if (
+                  item.type == (state.items[i].portTypes[index] ?? "") ||
+                  item.type == ""
+                ) {
+                  newPortTypes.push(state.items[i].portTypes[index] ?? "");
                   newReadValsItem = state.items[i].readVals[index];
+                } else {
+                  newPortTypes.push(item.type);
                 }
                 newReadValsItem.push(...item.data);
                 newReadVals.push(
@@ -108,12 +113,16 @@ const sensorSlice = createSlice({
             let newReadVals: DataElement[][] = [];
 
             data.forEach((uploadItem, index) => {
-              newPortTypes.push(uploadItem.type);
               let newReadValsItem: DataElement[] = [];
               if (
-                uploadItem.type == (state.uploadItems[i].portTypes[index] ?? "")
+                uploadItem.type ==
+                  (state.uploadItems[i].portTypes[index] ?? "") ||
+                uploadItem.type == ""
               ) {
+                newPortTypes.push(state.items[i].portTypes[index] ?? "");
                 newReadValsItem = state.uploadItems[i].readVals[index];
+              } else {
+                newPortTypes.push(uploadItem.type);
               }
               newReadValsItem.push(...uploadItem.data);
               newReadVals.push(
@@ -209,12 +218,16 @@ const sensorSlice = createSlice({
 
             data.forEach((item, index) => {
               if (item && item.data) {
-                newPortTypes.push(item.type);
                 let newReadValsItem: DataElement[] = [];
                 if (
-                  item.type == (state.downloadItems[i].portTypes[index] ?? "")
+                  item.type ==
+                    (state.downloadItems[i].portTypes[index] ?? "") ||
+                  item.type == ""
                 ) {
+                  newPortTypes.push(state.items[i].portTypes[index] ?? "");
                   newReadValsItem = state.downloadItems[i].readVals[index];
+                } else {
+                  newPortTypes.push(item.type);
                 }
                 newReadValsItem.push(...item.data);
                 newReadVals.push(

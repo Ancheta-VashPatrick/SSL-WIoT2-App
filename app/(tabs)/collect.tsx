@@ -31,7 +31,7 @@ export default function CollectScreen() {
 
       setInterval(() => {
         oppCollect();
-      }, 20000);
+      }, 15000);
     }, []);
 
     const devicesData = store.getState().devicesData;

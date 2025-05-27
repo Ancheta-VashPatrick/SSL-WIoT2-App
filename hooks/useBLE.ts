@@ -299,7 +299,7 @@ function useBLE() {
           let nodeId = device?.localName ?? device?.name ?? "DEFAULT";
           // .toLowerCase()
           // .slice(12);
-          let data = value.filter((item) => item.type != "");
+          let data = value;
           dispatch(updateUploadNode({ nodeId, data }));
           dispatch(updateNode({ nodeId, data }));
           let newSuccess = getSuccess();
@@ -422,6 +422,9 @@ function useBLE() {
           const portType =
             rawPortType === "phxx" ? rawPortType.slice(0, 2) : rawPortType;
           // console.log(portType);
+          if (portType == "none") {
+            return { type: "", data: [] };
+          }
 
           const TZ_OFFSET = 8;
 
@@ -472,7 +475,7 @@ function useBLE() {
           if (readValsBuffer.length) {
             return { type: portType, data: readValsBuffer };
           } else {
-            return null;
+            return { type: "", data: [] };
           }
         } catch (error) {
           console.log(error);
