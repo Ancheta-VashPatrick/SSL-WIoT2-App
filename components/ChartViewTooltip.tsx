@@ -60,6 +60,7 @@ const Tooltip: React.FC<Props> = (props) => {
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
+          second: "2-digit",
           hour12: true,
         })}
       </Text>

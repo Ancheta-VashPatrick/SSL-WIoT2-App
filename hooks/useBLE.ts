@@ -428,7 +428,7 @@ function useBLE() {
           let readValsBuffer = new Array();
 
           let start = 8;
-          let end = portType == "flow" ? 21 : 19;
+          let end = portType == "flow" ? 23 : 21;
 
           let currDate = new Date(
             `${readVal.substring(0, 4)}-${readVal.substring(
@@ -449,21 +449,22 @@ function useBLE() {
               date: new Date(
                 currDate.getTime() +
                   parseInt(readVal.substring(start, start + 2)) * 3600000 +
-                  parseInt(readVal.substring(start + 2, start + 4)) * 60000 -
+                  parseInt(readVal.substring(start + 2, start + 4)) * 60000 +
+                  parseInt(readVal.substring(start + 4, start + 6)) * 1000 -
                   TZ_OFFSET * 3600000
               ).toISOString(),
               value: parseFloat(
-                readVal.substring(start + (portType == "flow" ? 7 : 4), end)
+                readVal.substring(start + (portType == "flow" ? 9 : 6), end)
               ),
             });
             if (portType == "flow") {
               // console.log(rawVal);
               // console.log(readValsBuffer);
-              start += 15;
-              end += 15;
+              start += 17;
+              end += 17;
             } else {
-              start += 12;
-              end += 12;
+              start += 14;
+              end += 14;
             }
           }
 
